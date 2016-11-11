@@ -15,7 +15,7 @@ header {
 }
 
 .container {
-  max-width: 1024px;
+  max-width: 960px;
 }
 .container-fluid {
   margin-right: 0;
@@ -27,10 +27,6 @@ header {
 @media (max-width: 1023px) {
   .col-xs-12 {
     width: 100%;
-  }
-  .side-panel {
-    width: 80%;
-    max-width: 360px;
   }
 }
 
@@ -267,7 +263,8 @@ header {
   margin: 0 !important;
 }
 
-.relationType .panel-heading {
+.relationType .panel-heading,
+.thesauri .panel-heading {
   display: flex;
 
   .form-group, input {
@@ -275,17 +272,13 @@ header {
   }
   .form-group {
     width: 100%;
-    line-height: 32px;
+    position: relative;
   }
-}
-
-.thesauri .panel-heading {
-  display: flex;
-
-  .form-group, input {
-    margin: 0;
-  }
-  input {
-    width: 100%;
+  .validation-error {
+    position: absolute;
+    top: 0px;
+    right: 15px;
+    line-height: 34px;
+    height: 32px;
   }
 }

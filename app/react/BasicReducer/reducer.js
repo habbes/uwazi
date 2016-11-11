@@ -1,23 +1,40 @@
-import Immutable from 'immutable';
+import {fromJS as Immutable} from 'immutable';
 
 const SET = 'SET';
+const UPDATE = 'UPDATE';
 const UNSET = 'UNSET';
 const REMOVE = 'REMOVE';
+const PUSH = 'PUSH';
 
 export default function createReducer(namespace, defaultValue) {
   return (currentState = defaultValue, action = {}) => {
-    if (action.type === `${namespace}/${SET}`) {
-      return Immutable.fromJS(action.value);
-    }
-    if (action.type === `${namespace}/${UNSET}`) {
-      return Immutable.fromJS(defaultValue);
-    }
-    if (action.type === `${namespace}/${REMOVE}`) {
-      return Immutable.fromJS(currentState).filter((object) => {
+    switch (action.type) {
+    case `${namespace}/${SET}`:
+      return Immutable(action.value);
+
+    case `${namespace}/${UNSET}`:
+      return Immutable(defaultValue);
+
+    case `${namespace}/${PUSH}`:
+      return currentState.push(Immutable(action.value));
+
+    case `${namespace}/${REMOVE}`:
+      return Immutable(currentState).filter((object) => {
         return object.get('_id') !== action.value._id;
       });
+    case `${namespace}/${UPDATE}`:
+      return currentState.set(currentState.findIndex(o => o.get('_id') === action.value._id), Immutable(action.value));
+
+    default:
+      return Immutable(currentState);
     }
-    return Immutable.fromJS(currentState);
+  };
+}
+
+export function update(namespace, value) {
+  return {
+    type: `${namespace}/${UPDATE}`,
+    value
   };
 }
 
@@ -31,6 +48,13 @@ export function set(namespace, value) {
 export function unset(namespace) {
   return {
     type: `${namespace}/${UNSET}`
+  };
+}
+
+export function push(namespace, value) {
+  return {
+    type: `${namespace}/${PUSH}`,
+    value
   };
 }
 

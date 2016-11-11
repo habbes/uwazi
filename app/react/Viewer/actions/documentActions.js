@@ -1,13 +1,15 @@
-import * as types from 'app/Viewer/actions/actionTypes';
 import api from 'app/utils/api';
 import referencesAPI from 'app/Viewer/referencesAPI';
+import * as types from 'app/Viewer/actions/actionTypes';
+import * as connectionsTypes from 'app/Connections/actions/actionTypes';
 
-import {viewerSearching} from 'app/Viewer/actions/uiActions';
 import {actions} from 'app/BasicReducer';
 import {actions as formActions} from 'react-redux-form';
 import documents from 'app/Documents';
 import {notify} from 'app/Notifications';
 import {removeDocument, unselectDocument} from 'app/Library/actions/libraryActions';
+import referencesUtils from '../utils/referencesUtils';
+import * as selectionActions from './selectionActions';
 import * as uiActions from './uiActions';
 
 export function setDocument(document, html) {
@@ -66,7 +68,7 @@ export function deleteDocument(doc) {
 
 
 export function loadTargetDocument(id) {
-  return function (dispatch) {
+  return function (dispatch, getState) {
     return Promise.all([
       api.get('documents?_id=' + id),
       api.get('documents/html?_id=' + id),
@@ -75,24 +77,19 @@ export function loadTargetDocument(id) {
     .then(([docResponse, htmlResponse, references]) => {
       dispatch(actions.set('viewer/targetDoc', docResponse.json.rows[0]));
       dispatch(actions.set('viewer/targetDocHTML', htmlResponse.json));
-      dispatch(actions.set('viewer/targetDocReferences', references));
+      dispatch(actions.set('viewer/targetDocReferences', referencesUtils.filterRelevant(references, getState().locale)));
     });
   };
 }
 
-export function viewerSearchDocuments(searchTerm) {
+export function cancelTargetDocument() {
   return function (dispatch) {
-    dispatch(viewerSearching());
-
-    let search = {
-      searchTerm,
-      fields: ['doc.title']
-    };
-
-    return api.get('search', search)
-    .then((response) => {
-      dispatch(actions.set('viewer/documentResults', response.json.rows));
-    });
+    dispatch({type: connectionsTypes.CANCEL_RANGED_CONNECTION});
+    dispatch(actions.unset('viewer/targetDoc'));
+    dispatch(actions.unset('viewer/targetDocHTML'));
+    dispatch(actions.unset('viewer/targetDocReferences'));
+    dispatch(selectionActions.unsetTargetSelection());
+    dispatch(uiActions.openPanel('viewMetadataPanel'));
   };
 }
 

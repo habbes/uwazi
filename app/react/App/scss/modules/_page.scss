@@ -1,5 +1,9 @@
 .page-viewer {
-  .page {
-    padding: 30px 45px;
+  padding-top: 0;
+  padding-bottom: 0;
+  background: $c-white;
+  
+  .main-wrapper {
+    padding-bottom: 0;
   }
 }

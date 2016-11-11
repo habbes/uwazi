@@ -4,6 +4,8 @@ import SidePanel from 'app/Layout/SidePanel';
 import {formater, ShowMetadata} from 'app/Metadata';
 import {bindActionCreators} from 'redux';
 import {saveDocument, saveToc, editToc, removeFromToc, indentTocElement} from '../actions/documentActions';
+import {actions as connectionsActions} from 'app/Connections';
+import {uiActions as connectionsUiActions} from 'app/Connections';
 import {closePanel, showTab} from '../actions/uiActions';
 import {actions as formActions} from 'react-redux-form';
 
@@ -11,6 +13,7 @@ import DocumentForm from '../containers/DocumentForm';
 import modals from 'app/Modals';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import Connections from './ConnectionsList';
+import {AttachmentsList, UploadAttachment} from 'app/Attachments';
 import ShowIf from 'app/App/ShowIf';
 import {NeedAuthorization} from 'app/Auth';
 import {actions} from 'app/Metadata';
@@ -18,6 +21,9 @@ import {deleteDocument} from 'app/Viewer/actions/documentActions';
 import {browserHistory} from 'react-router';
 import {TocForm, ShowToc} from 'app/Documents';
 import {MetadataFormButtons} from 'app/Metadata';
+import {createSelector} from 'reselect';
+
+import {fromJS} from 'immutable';
 
 export class ViewMetadataPanel extends Component {
   deleteDocument() {
@@ -34,7 +40,7 @@ export class ViewMetadataPanel extends Component {
   }
 
   close() {
-    if (this.props.formState.dirty) {
+    if (this.props.formDirty) {
       return this.props.showModal('ConfirmCloseForm', this.props.doc);
     }
     this.props.resetForm('documentViewer.docForm');
@@ -49,6 +55,15 @@ export class ViewMetadataPanel extends Component {
   render() {
     const {doc, docBeingEdited} = this.props;
 
+    const propReferences = this.props.references.toJS();
+    const references = propReferences.filter(r => {
+      return typeof r.range.start !== 'undefined';
+    });
+    const connections = propReferences.filter(r => {
+      return typeof r.range.start === 'undefined';
+    });
+    const attachments = doc.attachments ? doc.attachments : [];
+
     return (
       <SidePanel open={this.props.open} className="metadata-sidepanel">
         <div className="sidepanel-header">
@@ -56,8 +71,7 @@ export class ViewMetadataPanel extends Component {
           <Tabs selectedTab={this.props.tab || 'metadata'}
             handleSelect={(tab) => {
               this.props.showTab(tab);
-            }}
-          >
+            }}>
             <ul className="nav nav-tabs">
               <li>
                 <TabLink to="toc">
@@ -70,9 +84,21 @@ export class ViewMetadataPanel extends Component {
                 </TabLink>
               </li>
               <li>
-                <TabLink to="connections">
+                <TabLink to="references">
                   <i className="fa fa-sitemap"></i>
-                  <span className="connectionsNumber">{this.props.references.size}</span>
+                  <span className="connectionsNumber">{references.length}</span>
+                </TabLink>
+              </li>
+              <li>
+                <TabLink to="connections">
+                  <i className="fa fa-share-alt"></i>
+                  <span className="connectionsNumber">{connections.length}</span>
+                </TabLink>
+              </li>
+              <li>
+                <TabLink to="attachments">
+                  <i className="fa fa-paperclip"></i>
+                  <span className="connectionsNumber">{attachments.length}</span>
                 </TabLink>
               </li>
             </ul>
@@ -86,26 +112,49 @@ export class ViewMetadataPanel extends Component {
             entityBeingEdited={docBeingEdited}
           />
         </ShowIf>
+
         <NeedAuthorization>
-            <ShowIf if={this.props.tab === 'toc' && this.props.tocBeingEdited}>
-              <div className="sidepanel-footer">
-              <button type="submit" form="tocForm" className="edit-toc btn btn-success">
-                <i className="fa fa-save"></i>
-                <span className="btn-label">Save</span>
-              </button>
-              </div>
-            </ShowIf>
+          <ShowIf if={this.props.tab === 'toc' && this.props.tocBeingEdited}>
+            <div className="sidepanel-footer">
+            <button type="submit" form="tocForm" className="edit-toc btn btn-success">
+              <i className="fa fa-save"></i>
+              <span className="btn-label">Save</span>
+            </button>
+            </div>
+          </ShowIf>
         </NeedAuthorization>
+
         <NeedAuthorization>
-            <ShowIf if={this.props.tab === 'toc' && !this.props.tocBeingEdited}>
-              <div className="sidepanel-footer">
-              <button onClick={() => this.props.editToc(this.props.doc.toc || [])} className="edit-toc btn btn-success">
-                <i className="fa fa-pencil"></i>
-                <span className="btn-label">Edit</span>
-              </button>
-              </div>
-            </ShowIf>
+          <ShowIf if={this.props.tab === 'toc' && !this.props.tocBeingEdited}>
+            <div className="sidepanel-footer">
+            <button onClick={() => this.props.editToc(this.props.doc.toc || [])} className="edit-toc btn btn-success">
+              <i className="fa fa-pencil"></i>
+              <span className="btn-label">Edit</span>
+            </button>
+            </div>
+          </ShowIf>
         </NeedAuthorization>
+
+        <NeedAuthorization>
+          <ShowIf if={this.props.tab === 'connections' && !this.props.isTargetDoc}>
+            <div className="sidepanel-footer">
+            <button onClick={this.props.startNewConnection.bind(null, 'basic', doc.sharedId)}
+                    className="create-connection btn btn-success">
+              <i className="fa fa-plus"></i>
+              <span className="btn-label">New</span>
+            </button>
+            </div>
+          </ShowIf>
+        </NeedAuthorization>
+
+        <NeedAuthorization>
+          <ShowIf if={this.props.tab === 'attachments' && !this.props.isTargetDoc}>
+            <div className="sidepanel-footer">
+              <UploadAttachment entityId={doc._id}/>
+            </div>
+          </ShowIf>
+        </NeedAuthorization>
+
         <div className="sidepanel-body">
           <Tabs selectedTab={this.props.tab || 'metadata'}>
             <TabContent for="toc">
@@ -130,8 +179,17 @@ export class ViewMetadataPanel extends Component {
                 return <ShowMetadata entity={doc} showTitle={true} showType={true} />;
               })()}
             </TabContent>
+            <TabContent for="references">
+              <Connections references={fromJS(references)} />
+            </TabContent>
             <TabContent for="connections">
-              <Connections references={this.props.references} />
+              <Connections references={fromJS(connections)}
+                           referencesSection="connections"
+                           useSourceTargetIcons={false} />
+            </TabContent>
+            <TabContent for="attachments">
+              <AttachmentsList files={fromJS(attachments)}
+                               parentId={doc._id} />
             </TabContent>
           </Tabs>
         </div>
@@ -142,7 +200,7 @@ export class ViewMetadataPanel extends Component {
 
 ViewMetadataPanel.propTypes = {
   doc: PropTypes.object,
-  formState: PropTypes.object,
+  formDirty: PropTypes.bool,
   templates: PropTypes.object,
   rawDoc: PropTypes.object,
   docBeingEdited: PropTypes.bool,
@@ -151,6 +209,8 @@ ViewMetadataPanel.propTypes = {
   showTab: PropTypes.func,
   tab: PropTypes.string,
   saveDocument: PropTypes.func,
+  startNewConnection: PropTypes.func,
+  closeConnectionsPanel: PropTypes.func,
   closePanel: PropTypes.func,
   showModal: PropTypes.func,
   deleteDocument: PropTypes.func,
@@ -162,23 +222,35 @@ ViewMetadataPanel.propTypes = {
   saveToc: PropTypes.func,
   editToc: PropTypes.func,
   removeFromToc: PropTypes.func,
-  indentTocElement: PropTypes.func
+  indentTocElement: PropTypes.func,
+  isTargetDoc: PropTypes.bool
 };
 
 ViewMetadataPanel.contextTypes = {
   confirm: PropTypes.func
 };
 
+const selectTemplates = createSelector(s => s.templates, t => t.toJS());
+const selectThesauris = createSelector(s => s.thesauris, t => t.toJS());
+const getSourceDoc = createSelector(s => s.doc, d => d.toJS());
+const getTargetDoc = createSelector(s => s.targetDoc, t => t.toJS());
+const getSourceMetadata = createSelector(
+  getSourceDoc, selectTemplates, selectThesauris,
+  (doc, templates, thesauris) => formater.prepareMetadata(doc, templates, thesauris)
+);
+const getTargetMetadata = createSelector(
+  getTargetDoc, selectTemplates, selectThesauris,
+  (doc, templates, thesauris) => formater.prepareMetadata(doc, templates, thesauris)
+);
+
 const mapStateToProps = ({documentViewer}) => {
-  let doc = formater.prepareMetadata(documentViewer.doc.toJS(), documentViewer.templates.toJS(), documentViewer.thesauris.toJS());
+  let doc = getSourceMetadata(documentViewer);
   let references = documentViewer.references;
 
   if (documentViewer.targetDoc.get('_id')) {
-    doc = formater.prepareMetadata(documentViewer.targetDoc.toJS(), documentViewer.templates.toJS(), documentViewer.thesauris.toJS());
+    doc = getTargetMetadata(documentViewer);
     references = documentViewer.targetDocReferences;
   }
-
-  references = references.filterNot((ref) => !ref.get('inbound') && ref.get('sourceType') === 'metadata');
 
   return {
     open: documentViewer.uiState.get('panel') === 'viewMetadataPanel',
@@ -186,12 +258,13 @@ const mapStateToProps = ({documentViewer}) => {
     doc,
     rawDoc: documentViewer.doc,
     docBeingEdited: !!documentViewer.docForm._id,
-    formState: documentViewer.docFormState,
+    formDirty: documentViewer.docFormState.dirty,
     tab: documentViewer.uiState.get('tab'),
     references,
     tocForm: documentViewer.tocForm || [],
     tocBeingEdited: documentViewer.tocBeingEdited,
-    tocFormState: documentViewer.tocFormState
+    tocFormState: documentViewer.tocFormState,
+    isTargetDoc: !!documentViewer.targetDoc.get('_id')
   };
 };
 
@@ -199,10 +272,13 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     loadInReduxForm: actions.loadInReduxForm,
     showModal: modals.actions.showModal,
-    showTab, saveDocument,
+    startNewConnection: connectionsActions.startNewConnection,
+    closeConnectionsPanel: connectionsUiActions.closePanel,
+    resetForm: formActions.reset,
+    showTab,
+    saveDocument,
     closePanel,
     deleteDocument,
-    resetForm: formActions.reset,
     saveToc,
     editToc,
     removeFromToc,

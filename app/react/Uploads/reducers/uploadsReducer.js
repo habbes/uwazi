@@ -14,15 +14,16 @@ export default function documents(state = initialState, action = {}) {
   }
 
   if (action.type === types.UPLOAD_COMPLETE) {
-    return state.update(state.findIndex(doc => doc.get('_id') === action.doc), (doc) => doc.set('uploaded', true));
+    return state.update(state.findIndex(doc => doc.get('sharedId') === action.doc), (doc) => doc.set('uploaded', true));
   }
 
   if (action.type === types.UPDATE_DOCUMENT) {
-    return state.update(state.findIndex(doc => doc.get('_id') === action.doc._id), (doc) => doc.merge(Immutable.fromJS(action.doc)));
+    return state.update(state.findIndex(doc => doc.get('sharedId') === action.doc.sharedId), (doc) => doc.merge(Immutable.fromJS(action.doc)));
   }
 
   if (action.type === types.CONVERSION_COMPLETE) {
-    return state.update(state.findIndex(doc => doc.get('_id') === action.doc), (doc) => doc.set('processed', true));
+    const index = state.findIndex(doc => doc.get('sharedId') === action.doc);
+    return index >= 0 ? state.update(index, (doc) => doc.set('processed', true)) : state;
   }
 
   if (action.type === types.MOVED_TO_LIBRARY) {

@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {bindActionCreators} from 'redux';
 import {Field, Form, actions as formActions} from 'react-redux-form';
 import {connect} from 'react-redux';
-import {Link} from 'react-router';
+import {I18NLink} from 'app/I18N';
 import 'app/Thesauris/scss/thesauris.scss';
 
 import FormGroup from 'app/DocumentForm/components/FormGroup';
@@ -34,7 +34,7 @@ export class ThesauriForm extends Component {
     }
 
     return (
-      <div className="row thesauri">
+      <div className="thesauri">
           <Form
             model="thesauri.data"
             onSubmit={this.props.saveThesauri}
@@ -42,26 +42,26 @@ export class ThesauriForm extends Component {
           >
             <div className="panel panel-default thesauri">
               <div className="panel-heading">
-                <Link to="/settings/dictionaries" className="btn btn-default"><i className="fa fa-arrow-left"></i> Back</Link>
+                <I18NLink to="/settings/dictionaries" className="btn btn-default"><i className="fa fa-arrow-left"></i> Back</I18NLink>
                 &nbsp;
-                <Field model="thesauri.data.name">
-                  <input id="thesauriName" className="form-control" type="text" placeholder="Thesauri name" />
-                </Field>
+                <FormGroup {...this.props.state.fields.name} submitFailed={this.props.state.submitFailed}>
+                  <Field model="thesauri.data.name">
+                    <input id="thesauriName" className="form-control" type="text" placeholder="Thesauri name" />
+                    {(() => {
+                      if (this.props.state.dirty && this.props.state.fields.name && this.props.state.fields.name.errors.duplicated) {
+                        return <div className="validation-error">
+                                  <i className="fa fa-exclamation-triangle"></i>
+                                  &nbsp;
+                                  Duplicated name
+                              </div>;
+                      }
+                    })()}
+                  </Field>
+                </FormGroup>
                 &nbsp;
                 <button className="btn btn-success save-template">
                   <i className="fa fa-save"/> Save
                 </button>
-                <FormGroup {...this.props.state.fields.name} submitFailed={this.props.state.submitFailed}>
-                {(() => {
-                  if (this.props.state.dirty && this.props.state.fields.name && this.props.state.fields.name.errors.duplicated) {
-                    return <div className="validation-error">
-                              <i className="fa fa-exclamation-triangle"></i>
-                              &nbsp;
-                              Duplicated name
-                          </div>;
-                  }
-                })()}
-                </FormGroup>
               </div>
               <ul className="thesauri-values list-group">
                 <li className="list-group-item"><b>Items:</b></li>

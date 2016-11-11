@@ -17,14 +17,14 @@ describe('uploadsReducer', () => {
   describe('UPDATE_DOCUMENT', () => {
     it('should update the document with document passed', () => {
       let state = Immutable.fromJS([
-        {_id: 1, title: 'Song of Ice and Fire: The Winds of Winter'},
-        {_id: 2, title: 'Song of Ice and Fire: A Dream of Spring'}
+        {sharedId: 1, title: 'Song of Ice and Fire: The Winds of Winter'},
+        {sharedId: 2, title: 'Song of Ice and Fire: A Dream of Spring'}
       ]);
-      let doc = {_id: 1, metadata: {test: 'test'}};
+      let doc = {sharedId: 2, metadata: {test: 'test'}};
       let newState = uploadsReducer(state, {type: types.UPDATE_DOCUMENT, doc});
       let expected = Immutable.fromJS([
-        {_id: 1, metadata: {test: 'test'}, title: 'Song of Ice and Fire: The Winds of Winter'},
-        {_id: 2, title: 'Song of Ice and Fire: A Dream of Spring'}
+        {sharedId: 1, title: 'Song of Ice and Fire: The Winds of Winter'},
+        {sharedId: 2, metadata: {test: 'test'}, title: 'Song of Ice and Fire: A Dream of Spring'}
       ]);
       expect(newState).toEqualImmutable(expected);
     });
@@ -57,16 +57,22 @@ describe('uploadsReducer', () => {
 
   describe('UPLOAD_COMPLETE', () => {
     it('should set uploaded flag to true for the document', () => {
-      let currentState = Immutable.fromJS([{_id: 'id1', title: '1'}, {_id: 'id2', title: '2'}]);
+      let currentState = Immutable.fromJS([{sharedId: 'id1', title: '1'}, {sharedId: 'id2', title: '2'}]);
       let newState = uploadsReducer(currentState, {type: types.UPLOAD_COMPLETE, doc: 'id2'});
-      expect(newState.toJS()).toEqual([{_id: 'id1', title: '1'}, {_id: 'id2', title: '2', uploaded: true}]);
+      expect(newState.toJS()).toEqual([{sharedId: 'id1', title: '1'}, {sharedId: 'id2', title: '2', uploaded: true}]);
     });
   });
   describe('CONVERSION_COMPLETE', () => {
     it('should set processed flag to true for the document', () => {
-      let currentState = Immutable.fromJS([{_id: 'id1', title: '1'}, {_id: 'id2', title: '2'}]);
-      let newState = uploadsReducer(currentState, {type: types.CONVERSION_COMPLETE, doc: 'id2'});
-      expect(newState.toJS()).toEqual([{_id: 'id1', title: '1'}, {_id: 'id2', title: '2', processed: true}]);
+      let currentState = Immutable.fromJS([{_id: 'id1', title: '1', sharedId: 's1'}, {_id: 'id2', title: '2', sharedId: 's2'}]);
+      let newState = uploadsReducer(currentState, {type: types.CONVERSION_COMPLETE, doc: 's2'});
+      expect(newState.toJS()).toEqual([{_id: 'id1', title: '1', sharedId: 's1'}, {_id: 'id2', title: '2', sharedId: 's2', processed: true}]);
+    });
+
+    it('should not set processed if index not found', () => {
+      let currentState = Immutable.fromJS([{_id: 'id1', title: '1', sharedId: 's1'}, {_id: 'id2', title: '2', sharedId: 's2'}]);
+      let newState = uploadsReducer(currentState, {type: types.CONVERSION_COMPLETE, doc: 's3'});
+      expect(newState.toJS()).toEqual([{_id: 'id1', title: '1', sharedId: 's1'}, {_id: 'id2', title: '2', sharedId: 's2'}]);
     });
   });
 

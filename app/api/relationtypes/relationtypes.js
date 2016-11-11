@@ -2,6 +2,7 @@ import {db_url as dbUrl} from 'api/config/database';
 import request from 'shared/JSONRequest';
 import sanitizeResponse from 'api/utils/sanitizeResponse';
 import references from 'api/references/references';
+import translations from 'api/i18n/translations';
 
 let checkDuplicated = (relationtype) => {
   let url = `${dbUrl}/_design/relationtypes/_view/all`;
@@ -18,6 +19,32 @@ let checkDuplicated = (relationtype) => {
     }
   });
 };
+
+function _save(relationtype) {
+  let values = {};
+  values[relationtype.name] = relationtype.name;
+  return request.post(dbUrl, relationtype)
+  .then((response) => {
+    translations.addContext(response.json.id, relationtype.name, values);
+    return response;
+  });
+}
+
+function updateTranslation(id, oldName, newName) {
+  let updatedNames = {};
+  updatedNames[oldName] = newName;
+  let values = {};
+  values[newName] = newName;
+  translations.updateContext(id, newName, updatedNames, [], values);
+}
+
+function _update(relationtype) {
+  return request.get(`${dbUrl}/${relationtype._id}`)
+  .then((response) => {
+    updateTranslation(relationtype._id, response.json.name, relationtype.name);
+    return request.post(dbUrl, relationtype);
+  });
+}
 
 export default {
   getAll() {
@@ -38,7 +65,10 @@ export default {
     relationtype.type = 'relationtype';
     return checkDuplicated(relationtype)
     .then(() => {
-      return request.post(dbUrl, relationtype);
+      if (!relationtype._id) {
+        return _save(relationtype);
+      }
+      return _update(relationtype);
     })
     .then(response => request.get(`${dbUrl}/${response.json.id}`))
     .then(response => response.json)
@@ -51,6 +81,7 @@ export default {
     return references.countByRelationType(relationtype._id)
     .then((referencesUsingIt) => {
       if (referencesUsingIt === 0) {
+        translations.deleteContext(relationtype._id);
         return request.delete(`${dbUrl}/${relationtype._id}`, {rev: relationtype._rev})
         .then(() => true);
       }

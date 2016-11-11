@@ -1,4 +1,5 @@
 import createReducer, * as actions from 'app/BasicReducer/reducer';
+import {fromJS as Immutable} from 'immutable';
 
 describe('BasicReducer', () => {
   describe('createReducer', () => {
@@ -6,6 +7,22 @@ describe('BasicReducer', () => {
       let reducer = createReducer('namespace', {});
       let newState = reducer();
       expect(newState.toJS()).toEqual({});
+    });
+  });
+
+  describe('Update', () => {
+    it('should set value passed on the same namespace', () => {
+      let reducer1 = createReducer('1', []);
+      let reducer2 = createReducer('2', []);
+
+      const state1 = reducer1({}, actions.set('1', [{_id: 1, title: 'test'}, {_id: 2, title: 'test2'}]));
+      const state2 = reducer2({}, actions.set('2', [{_id: 2, title: 'test2'}]));
+
+      const newState1 = reducer1(state1, actions.update('1', {_id: 2, title: 'updated'}));
+      const newState2 = reducer1(state2, actions.update('2', {_id: 2, title: 'updated'}));
+
+      expect(newState1.toJS()).toEqual([{_id: 1, title: 'test'}, {_id: 2, title: 'updated'}]);
+      expect(newState2.toJS()).toEqual([{_id: 2, title: 'test2'}]);
     });
   });
 
@@ -32,6 +49,20 @@ describe('BasicReducer', () => {
 
       expect(newState1.toJS()).toEqual({});
       expect(newState2.toJS()).toEqual({defaultValue: 'default'});
+    });
+  });
+
+  describe('Push', () => {
+    it('should add an element to an array', () => {
+      let reducer1 = createReducer('namespace1', []);
+      let reducer2 = createReducer('namespace2', []);
+
+      let newState1 = reducer1(Immutable([{_id: '1'}]), actions.push('namespace1', {_id: '2'}));
+      let newState2 = reducer2(Immutable([{_id: '1'}]), actions.push('namespace1', {_id: '2'}));
+
+      expect(newState1.toJS()).toEqual([{_id: '1'}, {_id: '2'}]);
+      expect(newState1.get(1).toJS()).toEqual({_id: '2'});
+      expect(newState2.toJS()).toEqual([{_id: '1'}]);
     });
   });
 

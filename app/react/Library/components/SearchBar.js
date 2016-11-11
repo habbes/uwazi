@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Link} from 'react-router';
+import {I18NLink} from 'app/I18N';
 import {Field, Form, actions as formActions} from 'react-redux-form';
 
 import {searchDocuments, setSearchTerm, getSuggestions, hideSuggestions, setOverSuggestions} from 'app/Library/actions/libraryActions';
@@ -67,13 +67,13 @@ export class SearchBar extends Component {
             className={'search-suggestions' + (showSuggestions && search.searchTerm || overSuggestions ? ' is-active' : '')}
             >
             {suggestions.toJS().map((suggestion, index) => {
-              let documentViewUrl = '/document/' + suggestion._id;
+              let documentViewUrl = `/${suggestion.type}/${suggestion.sharedId}`;
               return <p key={index}>
-                <Link to={documentViewUrl}>
+                <I18NLink to={documentViewUrl}>
                   <span dangerouslySetInnerHTML={{__html: suggestion.title}}/>
                   <i className="fa fa-external-link">
                   </i>
-                </Link>
+                </I18NLink>
               </p>;
             })}
             <p className="search-suggestions-all">

@@ -1,13 +1,12 @@
 .document-viewer {
   width: 100%;
-  padding: 30px;
+  padding: 15px;
   transition: all 500ms;
 
-  &.is-active {
     @media(min-width: 1024px) {
-      width: 75%;
-    }
-    @media(min-width: 1200px) {
+      padding: 30px;
+      
+      &.is-active {
       width: 66.666%;
     }
   }
@@ -15,6 +14,10 @@
   .cs-loader {
     height: 80px;
   }
+
+  // Hack to solve issue selecting text in some documents
+  div.c { pointer-events: none; }
+  div.c>* { pointer-events: auto; padding-right: 100px; }
 }
 
 .document-article {
@@ -26,10 +29,6 @@
   position: relative;
   font-size: $f-size-lg;
   font-family: sans-serif;
-
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: bold;
-  }
 }
 
 .document-viewer {
@@ -113,7 +112,7 @@
     width: 100%;
     left: 0;
     padding: 15px;
-    @include desktop {
+    @media(min-width: 1024px) {
       left: auto;
       max-width: 800px;
       padding: 15px 0;

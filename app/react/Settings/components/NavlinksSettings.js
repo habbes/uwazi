@@ -7,6 +7,7 @@ import {DragDropContext} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import {loadLinks, addLink, sortLink, saveLinks} from 'app/Settings/actions/navlinksActions';
+import {t} from 'app/I18N';
 import validator from 'app/Settings/utils/ValidateNavlinks';
 import NavlinkForm from './NavlinkForm';
 
@@ -24,7 +25,7 @@ export class NavlinksSettings extends Component {
     const payload = {_id: collection.get('_id'), _rev: collection.get('_rev'), links};
 
     return (
-      <div className="row relationType">
+      <div className="relationType">
         <div className="col-xs-12">
           <Form model="settings.navlinksData"
                 onSubmit={this.props.saveLinks.bind(this, payload)}
@@ -35,13 +36,13 @@ export class NavlinksSettings extends Component {
 
               <div className="panel-heading">
                 <div className={nameGroupClass}>
-                  Menu
+                  {t('System', 'Menu')}
                 </div>
                 &nbsp;
                 <button type="submit"
                         className="btn btn-success"
                         disabled={!!this.props.savingNavlinks}>
-                  <i className="fa fa-save"/> Save
+                  <i className="fa fa-save"/> {t('System', 'Save')}
                 </button>
               </div>
 
@@ -59,7 +60,7 @@ export class NavlinksSettings extends Component {
               <div className="panel-body">
                 <a className="btn btn-success"
                    onClick={this.props.addLink.bind(this, links)}>
-                  <i className="fa fa-plus"></i>&nbsp;<span>Add link</span>
+                  <i className="fa fa-plus"></i>&nbsp;<span>{t('System', 'Add link')}</span>
                 </a>
               </div>
 

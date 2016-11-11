@@ -10,10 +10,11 @@ import templatesAPI from 'app/Templates/TemplatesAPI';
 import relationTypesAPI from 'app/RelationTypes/RelationTypesAPI';
 import {actions} from 'app/BasicReducer';
 import {actions as formActions} from 'react-redux-form';
+import referencesUtils from 'app/Viewer/utils/referencesUtils';
 
 export default class ViewDocument extends RouteHandler {
 
-  static requestState({documentId}) {
+  static requestState({documentId, lang}) {
     return Promise.all([
       api.get('documents', {_id: documentId}),
       api.get('documents/html', {_id: documentId}),
@@ -28,11 +29,12 @@ export default class ViewDocument extends RouteHandler {
         documentViewer: {
           doc: doc.json.rows[0],
           docHTML: docHTML.json,
-          references,
+          references: referencesUtils.filterRelevant(references, lang),
           templates,
           thesauris,
           relationTypes
-        }
+        },
+        relationTypes
       };
     });
   }
@@ -52,7 +54,9 @@ export default class ViewDocument extends RouteHandler {
     this.context.store.dispatch(setReferences([]));
   }
 
-  setReduxState({documentViewer}) {
+  setReduxState(state) {
+    const {documentViewer} = state;
+    this.context.store.dispatch(actions.set('relationTypes', state.relationTypes));
     this.context.store.dispatch(actions.set('viewer/docHTML', documentViewer.docHTML));
     this.context.store.dispatch(actions.set('viewer/doc', documentViewer.doc));
     this.context.store.dispatch(actions.set('viewer/templates', documentViewer.templates));
@@ -65,8 +69,4 @@ export default class ViewDocument extends RouteHandler {
   render() {
     return <Viewer />;
   }
-
 }
-
-//when all components are integrated with redux we can remove this
-ViewDocument.__redux = true;

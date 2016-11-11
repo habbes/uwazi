@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {bindActionCreators} from 'redux';
 import {Field, Form, actions as formActions} from 'react-redux-form';
 import {connect} from 'react-redux';
-import {Link} from 'react-router';
+import {I18NLink} from 'app/I18N';
 
 import FormGroup from 'app/DocumentForm/components/FormGroup';
 import {saveRelationType, resetRelationType} from 'app/RelationTypes/actions/relationTypeActions';
@@ -28,7 +28,7 @@ export class RelationTypeForm extends Component {
 
   render() {
     return (
-      <div className="row relationType">
+      <div className="relationType">
           <Form
             model="relationType"
             onSubmit={this.props.saveRelationType}
@@ -36,26 +36,26 @@ export class RelationTypeForm extends Component {
           >
             <div className="panel panel-default">
               <div className="panel-heading relationType">
-                <Link to="/settings/connections" className="btn btn-default"><i className="fa fa-arrow-left"></i> Back</Link>
+                <I18NLink to="/settings/connections" className="btn btn-default"><i className="fa fa-arrow-left"></i> Back</I18NLink>
                 &nbsp;
                 <FormGroup {...this.props.state.fields.name} submitFailed={this.props.state.submitFailed}>
                   <Field model="relationType.name">
                       <input id="relationTypeName" className="form-control" type="text" placeholder="Connection name"/>
+                      {(() => {
+                        if (this.props.state.dirty && this.props.state.fields.name && this.props.state.fields.name.errors.duplicated) {
+                          return <div className="validation-error">
+                                    <i className="fa fa-exclamation-triangle"></i>
+                                    &nbsp;
+                                    Duplicated name
+                                </div>;
+                        }
+                      })()}
                   </Field>
                 </FormGroup>
                 &nbsp;
                 <button type="submit" className="btn btn-success save-template">
                   <i className="fa fa-save"/> Save
                 </button>
-                {(() => {
-                  if (this.props.state.dirty && this.props.state.fields.name && this.props.state.fields.name.errors.duplicated) {
-                    return <div className="validation-error">
-                              <i className="fa fa-exclamation-triangle"></i>
-                              &nbsp;
-                              Duplicated name
-                          </div>;
-                  }
-                })()}
               </div>
               <div className="panel-body">Currently connections only need a title.</div>
             </div>

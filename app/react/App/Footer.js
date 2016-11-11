@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {Link} from 'react-router';
+import {I18NLink, t} from 'app/I18N';
+import {createSelector} from 'reselect';
 
 class Footer extends Component {
 
@@ -27,20 +28,20 @@ class Footer extends Component {
             <li className="footer-nav_separator">&nbsp;</li>
 
             <li className="footer-nav_item">
-              <Link to="/">Library</Link>
+              <I18NLink to="/">{t('System', 'Library')}</I18NLink>
             </li>
             <li className="footer-nav_item">
-              <Link to="/uploads">Uploads</Link>
+              <I18NLink to="/uploads">{t('System', 'Uploads')}</I18NLink>
             </li>
             {(() => {
               if (!this.props.user._id) {
                 return <li className="footer-nav_item">
-                        <Link to="/login">Login</Link>
+                        <I18NLink to="/login">{t('System', 'Login')}</I18NLink>
                        </li>;
               }
 
               return <li className="footer-nav_item">
-                <Link to="/settings">Settings</Link>
+                <I18NLink to="/settings">{t('System', 'Settings')}</I18NLink>
               </li>;
             })()}
 
@@ -55,10 +56,13 @@ Footer.propTypes = {
   siteName: PropTypes.string
 };
 
+
+const selectUser = createSelector(s => s.user, u => u.toJS());
+
 export function mapStateToProps(state) {
   return {
-    user: state.user.toJS(),
-    siteName: state.settings.collection.toJS().site_name
+    user: selectUser(state),
+    siteName: state.settings.collection.get('site_name')
   };
 }
 
