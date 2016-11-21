@@ -21,6 +21,7 @@ var SpecReporter = require('jasmine-spec-reporter');
 
 var db_config = require('./app/api/config/database.js');
 db_config.db_url = db_config.testing;
+db_config.neo4jurl = db_config.neo4jurltesting;
 
 var elasticConfig = require('./app/api/config/elasticIndexes.js');
 elasticConfig.index = elasticConfig.production;
