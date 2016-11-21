@@ -8,6 +8,7 @@ let cookie;
 let locale;
 
 let handleError = (error) => {
+  console.log(error);
   if (error.status === 401) {
     browserHistory.replace('/login');
   }
@@ -24,6 +25,10 @@ export default {
 
   post: (url, data) => {
     return request.post(APIURL + url, data, {'Content-language': locale})
+    .then((response) => {
+      console.log(response);
+      return response;
+    })
     .catch(handleError);
   },
 

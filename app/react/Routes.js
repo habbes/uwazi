@@ -94,13 +94,15 @@ const routes = (
   </Route>
 );
 
-export default (
-  <Route path='/' component={App}>
-    {routes}
-    <Route path=':lang'>
-      {routes}
-      <Route path="*" component={NoMatch} />
-    </Route>
-    <Route path="*" component={NoMatch} />
-  </Route>
-);
+export default routes;
+
+//export default (
+  //<Route path='/' component={App}>
+    //{routes}
+    //<Route path=':lang'>
+      //{routes}
+      //<Route path="*" component={NoMatch} />
+    //</Route>
+    //<Route path="*" component={NoMatch} />
+  //</Route>
+//);
