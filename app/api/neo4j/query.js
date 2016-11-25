@@ -1,8 +1,8 @@
 import driver from './driver';
 
-export default (query) => {
+export default (query, params) => {
   let session = driver.session();
-  return session.run(query)
+  return session.run(query, params)
   .then((response) => {
     session.close();
     return response;

@@ -1,5 +1,6 @@
 import model from 'api/neo4j/model';
 import query from 'api/neo4j/query';
+import {catchErrors} from 'api/utils/jasmineHelpers';
 
 fdescribe('neo4j model', () => {
   let testModel = model('SuperHero');
@@ -15,16 +16,26 @@ fdescribe('neo4j model', () => {
   });
 
   describe('get', () => {
-    it('should return all SuperHeroes', (done) => {
+    it('should return all nodes with label SuperHero', (done) => {
       testModel.get()
       .then((response) => {
-        expect(response.rows[0].properties).toEqual({name: 'Batman'});
+        expect(response.rows[0].name).toEqual('Batman');
+        expect(response.rows[0]._id).toBeDefined();
         done();
       })
-      .catch((errors) => {
-        console.log(errors);
+      .catch(catchErrors(done));
+    });
+  });
+
+  describe('save', () => {
+    it('should save the SuperHero and return it', (done) => {
+      testModel.save({name: 'Spiderman'})
+      .then((response) => {
+        expect(response.name).toEqual('Spiderman');
+        expect(response._id).toBeDefined();
         done();
-      });
+      })
+      .catch(catchErrors(done));
     });
   });
 });
