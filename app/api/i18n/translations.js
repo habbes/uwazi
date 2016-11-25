@@ -2,13 +2,17 @@ import {db_url as dbURL} from 'api/config/database';
 import request from 'shared/JSONRequest';
 import sanitizeResponse from 'api/utils/sanitizeResponse';
 import settings from 'api/settings';
+import model from 'api/neo4j/model';
 
 export default {
   get() {
-    return request.get(`${dbURL}/_design/translations/_view/all`)
-    .then((response) => {
-      return sanitizeResponse(response.json);
-    });
+    // return request.get(`${dbURL}/_design/translations/_view/all`)
+    // .then((response) => {
+    //   return sanitizeResponse(response.json);
+    // });
+
+    let translationsModel = model('Translation');
+    return translationsModel.get();
   },
 
   save(translation) {

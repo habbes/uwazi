@@ -1,5 +1,6 @@
 import needsAuthorization from '../auth/authMiddleware';
 import thesauris from './thesauris';
+import model from 'api/neo4j/model';
 
 export default app => {
   app.post('/api/thesauris', needsAuthorization, (req, res) => {
@@ -13,16 +14,22 @@ export default app => {
   });
 
   app.get('/api/thesauris', (req, res) => {
-    let id;
-    if (req.query) {
-      id = req.query._id;
-    }
-    thesauris.get(id, req.language)
+    // let id;
+    // if (req.query) {
+    //   id = req.query._id;
+    // }
+    // thesauris.get(id, req.language)
+    // .then((response) => {
+    //   res.json(response);
+    // })
+    // .catch((error) => {
+    //   res.json({error: error.json});
+    // });
+
+    let templatesmodel = model('Thesauri');
+    templatesmodel.get()
     .then((response) => {
       res.json(response);
-    })
-    .catch((error) => {
-      res.json({error: error.json});
     });
   });
 

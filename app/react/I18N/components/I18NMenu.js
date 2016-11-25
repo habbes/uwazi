@@ -27,7 +27,8 @@ export class I18NMenu extends Component {
   }
 
   render() {
-    const languages = this.props.languages.toJS();
+    // const languages = this.props.languages.toJS();
+    const languages = [];
     let path = this.props.location.pathname;
     let locale = utils.getLocale(path, languages);
 

@@ -1,6 +1,7 @@
 import {db_url as dbURL} from 'api/config/database';
 import request from 'shared/JSONRequest';
 import translations from 'api/i18n/translations';
+import model from 'api/neo4j/model';
 
 function saveLinksTranslations(newLinks = [], currentLinks = []) {
   let updatedTitles = {};
@@ -51,13 +52,18 @@ function saveFiltersTranslations(_newFilters = [], _currentFilters = []) {
 
 export default {
   get() {
-    return request.get(`${dbURL}/_design/settings/_view/all`)
-    .then((result) => {
-      if (result.json.rows.length) {
-        return result.json.rows[0].value;
-      }
-
-      return {};
+    // return request.get(`${dbURL}/_design/settings/_view/all`)
+    // .then((result) => {
+    //   if (result.json.rows.length) {
+    //     return result.json.rows[0].value;
+    //   }
+    //
+    //   return {};
+    // });
+    let SettingsModel = model('Settings');
+    return SettingsModel.get()
+    .then((response) => {
+      return response.rows[0] || {};
     });
   },
 
