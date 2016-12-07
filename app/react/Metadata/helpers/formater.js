@@ -43,6 +43,10 @@ export default {
   select(property, thesauriValue, thesauris, showInCard) {
     let thesauri = thesauris.find(thes => thes._id === property.content);
 
+    if (!thesauri) {
+      return {label: property.label, value: '', showInCard};
+    }
+
     let option = thesauri.values.find(v => {
       return v.id.toString() === thesauriValue.toString();
     });
@@ -54,6 +58,10 @@ export default {
 
   multiselect(property, thesauriValues, thesauris, showInCard) {
     let thesauri = thesauris.find(thes => thes._id === property.content);
+
+    if (!thesauri || !thesauriValues) {
+      return {label: property.label, value: '', showInCard};
+    }
 
     let values = thesauriValues.map((thesauriValue) => {
       let option = thesauri.values.find(v => {
@@ -87,7 +95,6 @@ export default {
 
   prepareMetadata(doc, templates, thesauris) {
     let template = templates.find(temp => temp._id === doc.template);
-
     if (!template || !thesauris.length) {
       return Object.assign({}, doc, {metadata: [], documentType: ''});
     }

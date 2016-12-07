@@ -13,7 +13,7 @@ class Menu extends Component {
   }
 
   render() {
-    const {links} = this.props;
+    const links = this.props.links || [];
     const user = this.props.user.toJS();
 
     const navLinks = links.map(link =>

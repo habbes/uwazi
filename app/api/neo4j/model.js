@@ -4,7 +4,7 @@ export default (type) => {
   function processRecord(_record) {
     let record = _record.toObject();
     record.id.toInt();
-    return Object.assign({_id: record.id.toInt()}, record.properties);
+    return Object.assign({id: record.id.toInt()}, record.properties);
   }
 
   return {

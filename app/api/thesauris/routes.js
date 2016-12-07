@@ -1,6 +1,6 @@
 import needsAuthorization from '../auth/authMiddleware';
 import thesauris from './thesauris';
-import model from 'api/neo4j/model';
+import thesaurisModel from './thesaurisModel';
 
 export default app => {
   app.post('/api/thesauris', needsAuthorization, (req, res) => {
@@ -26,9 +26,9 @@ export default app => {
     //   res.json({error: error.json});
     // });
 
-    let templatesmodel = model('Thesauri');
-    templatesmodel.get()
+    return thesaurisModel.get()
     .then((response) => {
+      console.log(response);
       res.json(response);
     });
   });

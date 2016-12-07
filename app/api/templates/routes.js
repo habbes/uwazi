@@ -2,7 +2,7 @@ import {db_url as dbURL} from '../config/database.js';
 import request from 'shared/JSONRequest.js';
 import templates from './templates';
 import needsAuthorization from '../auth/authMiddleware';
-import model from 'api/neo4j/model';
+import templatesModel from './templatesModel';
 
 export default app => {
   app.post('/api/templates', needsAuthorization, (req, res) => {
@@ -32,8 +32,7 @@ export default app => {
     //   res.json({error: error.json});
     // });
 
-    let templatesmodel = model('Template');
-    return templatesmodel.get()
+    return templatesModel.get()
     .then((response) => {
       res.json(response);
     });
