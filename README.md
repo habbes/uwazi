@@ -45,7 +45,7 @@
       - `gem install docsplit`
       - install non optional dependencies for docsplit -> [https://documentcloud.github.io/docsplit/](https://documentcloud.github.io/docsplit/)
 
-- **CouchDB and Futon (being rolled out of the project)**
+- **CouchDB and Futon (being phased out of the project)**
     - Ubuntu
 
       ```
@@ -88,7 +88,7 @@
 
       - Now you need to go to localhost:7474 and localhost:7575 and configure the DB passwords.
 
-- **pdf2htmlEX**
+- **pdf2htmlEX (no longer required)**
     - OSX
 
       ```
