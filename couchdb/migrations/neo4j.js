@@ -47,9 +47,8 @@ function migrateEntity(_doc) {
   delete doc.icon;
   return entitiesModel.save(doc)
   .then((entity) => {
-    const entityId = entity.id;
-    const templateId = templatesIdMaps[oldTemplateId];
-    const queryString = `MATCH (e:Entity) WHERE id(e) = ${entityId} MATCH (t:Template) WHERE id(t) = ${templateId} CREATE (e)-[:TEMPLATE]->(t) RETURN (e)-[:TEMPLATE]->(t)`;
+    const entityId = entity._id;
+    const queryString = `MATCH (e:Entity) WHERE e._id ="${entityId}" MATCH (t:Template) WHERE t._id ="${oldTemplateId}" CREATE (e)-[:TEMPLATE]->(t) RETURN (e)-[:TEMPLATE]->(t)`;
     return query(queryString);
   });
 }

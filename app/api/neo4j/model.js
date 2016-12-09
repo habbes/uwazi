@@ -16,8 +16,8 @@ export default (type) => {
       });
     },
     save: (props) => {
-      props.id = props.id || ID();
-      return query(`MERGE (n:${type} {id: {props}.id}) SET n = {props} RETURN properties(n) AS props`, {props})
+      props._id = props._id || ID();
+      return query(`MERGE (n:${type} {_id: {props}._id}) SET n = {props} RETURN properties(n) AS props`, {props})
       .then((response) => {
         return processRecord(response.records[0]);
       });

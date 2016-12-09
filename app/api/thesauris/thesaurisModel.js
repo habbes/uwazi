@@ -1,4 +1,5 @@
 import query from 'api/neo4j/query';
+import ID from 'shared/uniqueID';
 
 function processDictionary(_record) {
   let record = _record.toObject();
@@ -17,7 +18,7 @@ const templatesModel = {
     return query('MATCH (d:Dictionary)-[r:VALUE]->(v:DictionaryValue) ' +
                  'WITH d, {label: v.label, id: v.id, icon: v.icon} as value ' +
                  'ORDER BY v.label ASC ' +
-                 'RETURN id(d) AS _id, properties(d) AS _props, collect(value) as values')
+                 'RETURN properties(d) AS _props, collect(value) as values')
     .then((response) => {
       return {
         rows: response.records.map(processDictionary)
@@ -41,15 +42,19 @@ const templatesModel = {
   },
 
   save: (dictionary) => {
-    const values = dictionary.values;
+    dictionary._id = dictionary._id || ID();
+    const values = dictionary.values.map((value) => {
+      value._id = value._id || ID();
+      return value;
+    });
     delete dictionary.values;
-    let queryString = 'CREATE (d:Dictionary {dictionary}) ' +
+    let queryString = 'MERGE (d:Dictionary {_id: {dictionary}._id}) SET d = {dictionary} ' +
                       'WITH d UNWIND {values} as map ' +
-                      'CREATE (v:DictionaryValue), ' +
-                      '(d)-[:VALUE]->(v) SET v = map ' +
-                      'WITH d, {label: v.label, _id: id(v), icon: v.icon} as value ' +
+                      'MERGE (v:DictionaryValue {_id: map._id}) SET v = map ' +
+                      'MERGE (d)-[:VALUE]->(v) ' +
+                      'WITH d, {label: v.label, _id: v._id, icon: v.icon} as value ' +
                       'ORDER BY v.label ASC ' +
-                      'RETURN id(d) AS _id, properties(d) AS _props, collect(value) as values';
+                      'RETURN properties(d) AS _props, collect(value) as values';
     return query(queryString, {dictionary, values})
     .then((response) => {
       return processDictionary(response.records[0]);

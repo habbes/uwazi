@@ -27,7 +27,7 @@ const templatesModel = {
 
   getById: (id) => {
     return query('MATCH (n:Template)-[r:PROPERTY]->(p:TemplateProperty) ' +
-                 `WHERE n.id="${id}" ` +
+                 `WHERE n._id="${id}" ` +
                  'WITH n, {properties: properties(p)} as prop ' +
                  'ORDER BY p.order ASC ' +
                  'RETURN properties(n) AS _props, collect(prop) as properties')
@@ -37,19 +37,19 @@ const templatesModel = {
   },
 
   save: (template) => {
-    template.id = template.id || ID();
+    template._id = template._id || ID();
     const properties = template.properties.map((prop, index) => {
       prop.order = index;
-      prop.id = prop.id || ID();
+      prop._id = prop._id || ID();
       if (prop.nestedProperties) {
         prop.nestedProperties = JSON.stringify(prop.nestedProperties);
       }
       return prop;
     });
     delete template.properties;
-    let queryString = 'MERGE (t:Template {id: {template}.id}) SET t = {template}' +
+    let queryString = 'MERGE (t:Template {id: {template}._id}) SET t = {template}' +
                       'WITH t UNWIND {properties} as prop ' +
-                      'MERGE (p:TemplateProperty {id: prop.id}) SET p = prop ' +
+                      'MERGE (p:TemplateProperty {id: prop._id}) SET p = prop ' +
                       'MERGE (t)-[:PROPERTY]->(p) ' +
                       'WITH t, {properties: properties(p)} as prop ' +
                       'ORDER BY p.order ASC ' +
