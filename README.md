@@ -45,7 +45,7 @@
       - `gem install docsplit`
       - install non optional dependencies for docsplit -> [https://documentcloud.github.io/docsplit/](https://documentcloud.github.io/docsplit/)
 
-- **CouchDB and Futon**
+- **CouchDB and Futon (being rolled out of the project)**
     - Ubuntu
 
       ```
@@ -54,6 +54,39 @@
       $ sudo apt-get update
       $ sudo apt-get install couchdb -y
       ```
+
+- **neo4j**
+    - Ubuntu
+
+      *Temporary instructions*
+
+      For development, the easiest way to deploy neo4j is to run the two required instances within Docker.
+      - Install Docker (https://docs.docker.com/engine/installation/linux/ubuntulinux/)
+      - If you prefer to have a GUI for docker (and assuming docker was installed with default values):
+
+      ```
+      $ docker run --restart always -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
+      ```
+
+      - Now, create the two containers for Neo4j, one mapped to the defaul ports, the other to whatever http port you like except 7474 (the default), we use 7575 for the demos here, and to the 32768 bolt port.  Be sure to point the data folders to different local directories.  Here are two scripts that will do everything automatically:
+
+      ```
+      $ docker run \
+          --restart always \
+          --publish=7474:7474 --publish=7687:7687 \
+          --volume=$HOME/neo4j/data:/data \
+          neo4j
+      ```
+
+      ```
+      $ docker run \
+          --restart always \
+          --publish=7575:7474 --publish=32768:7687 \
+          --volume=$HOME/neo4j/data-testing:/data \
+          neo4j
+      ```
+
+      - Now you need to go to localhost:7474 and localhost:7575 and configure the DB passwords.
 
 - **pdf2htmlEX**
     - OSX

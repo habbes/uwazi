@@ -96,11 +96,12 @@
     "world-countries": "^1.8.0"
   },
   "devDependencies": {
-    "couchdb-dump": "^2.2.1",
     "babel-istanbul-loader": "^0.1.0",
     "babel-loader": "^6.2.1",
     "babel-plugin-react-transform": "^2.0.0",
+    "bluebird": "^3.4.6",
     "compression": "^1.6.0",
+    "couchdb-dump": "^2.2.1",
     "css-loader": "^0.23.0",
     "del": "^2.0.2",
     "enzyme": "^2.2.0",
