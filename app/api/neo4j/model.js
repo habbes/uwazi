@@ -1,15 +1,14 @@
 import query from './query';
+import ID from 'shared/uniqueID';
 
 export default (type) => {
   function processRecord(_record) {
-    let record = _record.toObject();
-    record.id.toInt();
-    return Object.assign({id: record.id.toInt()}, record.properties);
+    return _record.toObject().props;
   }
 
   return {
     get: () => {
-      return query(`MATCH (n:${type}) RETURN properties(n) AS properties, id(n) AS id`)
+      return query(`MATCH (n:${type}) RETURN properties(n) as props`)
       .then((response) => {
         return {
           rows: response.records.map(processRecord)
@@ -17,7 +16,8 @@ export default (type) => {
       });
     },
     save: (props) => {
-      return query(`CREATE (n:${type}) SET n = {props} RETURN properties(n) AS properties, id(n) AS id`, {props})
+      props.id = props.id || ID();
+      return query(`MERGE (n:${type} {id: {props}.id}) SET n = {props} RETURN properties(n) AS props`, {props})
       .then((response) => {
         return processRecord(response.records[0]);
       });

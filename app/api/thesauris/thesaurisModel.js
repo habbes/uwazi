@@ -2,11 +2,6 @@ import query from 'api/neo4j/query';
 
 function processDictionary(_record) {
   let record = _record.toObject();
-  // record.values = record.values.map((value) => {
-  //   console.log(value.id);
-  //   value.id = value.id.toInt();
-  //   return value;
-  // });
   return Object.assign({}, record._props, {values: record.values});
 }
 

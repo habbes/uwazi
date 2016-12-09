@@ -7,7 +7,7 @@ fdescribe('templates model', () => {
   beforeEach((done) => {
     query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
     .then(() => {
-      return query('CREATE (t:Template {name: "Judge"}), ' +
+      return query('CREATE (t:Template {name: "Judge", id: "abc1"}), ' +
                    '(p0:TemplateProperty {name: "Name", order: 2}), ' +
                    '(p1:TemplateProperty {name:"Surname", order: 0}), ' +
                    '(p2:TemplateProperty {name:"Dob", order: 1}), ' +
@@ -43,7 +43,7 @@ fdescribe('templates model', () => {
         expect(response.name).toEqual('Mechanism');
         expect(response.properties[1].name).toBe('Country');
         expect(response.properties[1].order).toBe(1);
-        expect(response.properties[1]._id).toBeDefined();
+        expect(response.properties[1].id).toBeDefined();
         done();
       })
       .catch(catchErrors(done));
