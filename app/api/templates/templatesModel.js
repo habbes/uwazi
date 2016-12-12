@@ -9,7 +9,7 @@ function processRecord(_record) {
     }
     return prop.properties;
   })};
-  return Object.assign(record._props, properties);
+  return Object.assign(record._props, properties, {actualProps: record.actualProps});
 }
 
 const templatesModel = {
@@ -47,12 +47,13 @@ const templatesModel = {
       return prop;
     });
     delete template.properties;
-    let queryString = 'MERGE (t:Template {id: {template}._id}) SET t = {template}' +
+    let queryString = 'MERGE (t:Template {_id: {template}._id}) SET t = {template} ' +
+                      'WITH t MATCH (t)-[:PROPERTY]->(p) DETACH DELETE p ' +
                       'WITH t UNWIND {properties} as prop ' +
-                      'MERGE (p:TemplateProperty {id: prop._id}) SET p = prop ' +
+                      'MERGE (p:TemplateProperty {_id: prop._id}) SET p = prop ' +
                       'MERGE (t)-[:PROPERTY]->(p) ' +
                       'WITH t, {properties: properties(p)} as prop ' +
-                      'ORDER BY p.order ASC ' +
+                      'ORDER BY prop.order ASC ' +
                       'RETURN properties(t) AS _props, collect(prop) as properties';
     return query(queryString, {template, properties})
     .then((response) => {

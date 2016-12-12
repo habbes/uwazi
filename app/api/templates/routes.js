@@ -1,17 +1,20 @@
-import {db_url as dbURL} from '../config/database.js';
-import request from 'shared/JSONRequest.js';
 import templates from './templates';
 import needsAuthorization from '../auth/authMiddleware';
 import templatesModel from './templatesModel';
 
 export default app => {
   app.post('/api/templates', needsAuthorization, (req, res) => {
-    templates.save(req.body)
+    // templates.save(req.body)
+    // .then((response) => {
+    //   res.json(response);
+    // })
+    // .catch((error) => {
+    //   res.json({error});
+    // });
+
+    return templatesModel.save(req.body)
     .then((response) => {
       res.json(response);
-    })
-    .catch((error) => {
-      res.json({error});
     });
   });
 
