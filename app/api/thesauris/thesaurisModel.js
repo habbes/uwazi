@@ -58,15 +58,15 @@ const thesaurisModel = {
   save: (dictionary) => {
     dictionary._id = dictionary._id || ID();
     const values = dictionary.values.map((value) => {
-      value._id = value._id || ID();
+      value.id = value.id || ID();
       return value;
     });
     delete dictionary.values;
     let queryString = 'MERGE (d:Dictionary {_id: {dictionary}._id}) SET d = {dictionary} ' +
                       'WITH d UNWIND {values} as map ' +
-                      'MERGE (v:DictionaryValue {_id: map._id}) SET v = map ' +
+                      'MERGE (v:DictionaryValue {id: map.id}) SET v = map ' +
                       'MERGE (d)-[:VALUE]->(v) ' +
-                      'WITH d, {label: v.label, _id: v._id, icon: v.icon} as value ' +
+                      'WITH d, {label: v.label, id: v.id, icon: v.icon} as value ' +
                       'ORDER BY v.label ASC ' +
                       'RETURN properties(d) AS _props, collect(value) as values';
     return query(queryString, {dictionary, values})

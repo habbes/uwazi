@@ -70,7 +70,7 @@ describe('Thesauris model', () => {
     });
   });
 
-  describe('save', () => {
+  fdescribe('save', () => {
     it('should create a Dictionary with its values', (done) => {
       let dictionary = {name: 'SuprHeroes', values: [{label: 'Robin'}, {label: 'Batman'}]};
       thesaurisModel.save(dictionary)
@@ -82,10 +82,37 @@ describe('Thesauris model', () => {
       })
       .catch(catchErrors(done));
     });
+
+    it('should edit (MERGE) a Dictionary and values if existing ID is passed', (done) => {
+      const dictionary = {
+        _id: 'countries',
+        name: 'ChangedName',
+        values: [{label: 'NewValue'}, {label: 'Spain', id: 'abc2'}, {label: 'Ecuador', id: 'abc3'}]
+      };
+
+      thesaurisModel.save(dictionary)
+      .then((response) => {
+        expect(response._id).toEqual('countries');
+        expect(response.name).toEqual('ChangedName');
+        expect(response.values[0].label).toBe('Ecuador');
+        expect(response.values[1].label).toBe('NewValue');
+        expect(response.values[1].id).toBeDefined();
+        expect(response.values[2].label).toBe('Spain');
+
+        return thesaurisModel.getById('countries');
+      })
+      .then(response => {
+        const editedThesauri = response.rows[0];
+        expect(editedThesauri.name).toBe('ChangedName');
+        expect(editedThesauri.values.length).toBe(3);
+        done();
+      })
+      .catch(catchErrors(done));
+    });
   });
 
-  describe('delete', () => {
-    fit('should delete a Dictionary and its related values', (done) => {
+  fdescribe('delete', () => {
+    it('should delete a Dictionary and its related values', (done) => {
       thesaurisModel.delete('countries')
       .then(response => {
         expect(response).toBe('ok');

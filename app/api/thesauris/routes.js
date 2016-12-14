@@ -4,12 +4,10 @@ import thesaurisModel from './thesaurisModel';
 
 export default app => {
   app.post('/api/thesauris', needsAuthorization, (req, res) => {
-    thesauris.save(req.body)
-    .then((response) => {
-      res.json(response);
-    })
-    .catch((error) => {
-      res.json({error: error});
+    thesaurisModel.save(req.body)
+    .then(res.json)
+    .catch(error => {
+      res.json(error, 500);
     });
   });
 
