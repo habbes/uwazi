@@ -4,27 +4,31 @@ import fixtures from './fixtures.js';
 import {db_url as dbUrl} from '../../config/database.js';
 import request from '../../../shared/JSONRequest';
 import instrumentRoutes from '../../utils/instrumentRoutes';
-import thesauris from '../thesauris';
+import thesaurisModel from '../thesaurisModel';
+import neo4jdb from 'api/utils/neo4jdb.js';
 
 describe('thesauris routes', () => {
   let routes;
 
   beforeEach((done) => {
     routes = instrumentRoutes(thesaurisRoute);
-    database.reset_testing_database()
-    .then(() => database.import(fixtures))
-    .then(done)
-    .catch(done.fail);
+    neo4jdb.resetTestingDatabase()
+    .then(() => neo4jdb.import(fixtures))
+    .then(done);
   });
 
-  describe('GET', () => {
+  fdescribe('GET', () => {
     it('should return all thesauris by default', (done) => {
-      spyOn(thesauris, 'get').and.callThrough();
+      spyOn(thesaurisModel, 'get').and.callThrough();
+      spyOn(thesaurisModel, 'getEntities').and.callThrough();
       routes.get('/api/thesauris', {language: 'es'})
       .then((response) => {
-        let docs = response.rows;
-        expect(thesauris.get).toHaveBeenCalledWith(undefined, 'es');
-        expect(docs[0].name).toBe('secret recipes');
+        let thesauris = response.rows;
+        expect(thesaurisModel.get).toHaveBeenCalled();
+        expect(thesaurisModel.getEntities).toHaveBeenCalledWith('es');
+
+        const countries = thesauris.find(t => t.name === 'Countries');
+        expect(countries.values[0].label).toBe('Ecuador');
         done();
       })
       .catch(done.fail);
@@ -32,12 +36,12 @@ describe('thesauris routes', () => {
 
     describe('when passing id', () => {
       it('should return matching thesauri', (done) => {
-        let req = {query: {_id: 'c08ef2532f0bd008ac5174b45e033c94'}};
+        let req = {query: {_id: 'countries'}};
 
         routes.get('/api/thesauris', req)
         .then((response) => {
-          let docs = response.rows;
-          expect(docs[0].name).toBe('Top 2 scify books');
+          let doc = response.rows[0];
+          expect(doc.name).toBe('Countries');
           done();
         })
         .catch(done.fail);
@@ -62,11 +66,11 @@ describe('thesauris routes', () => {
 
   describe('DELETE', () => {
     it('should delete a thesauri', (done) => {
-      spyOn(thesauris, 'delete').and.returnValue(Promise.resolve());
+      spyOn(thesaurisModel, 'delete').and.returnValue(Promise.resolve());
       let req = {query: {_id: 'abc', _rev: '123'}};
       return routes.delete('/api/thesauris', req)
       .then(() => {
-        expect(thesauris.delete).toHaveBeenCalledWith('abc', '123');
+        expect(thesaurisModel.delete).toHaveBeenCalledWith('abc', '123');
         done();
       })
       .catch(done.fail);

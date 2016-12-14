@@ -14,7 +14,11 @@ export default app => {
   });
 
   app.get('/api/thesauris', (req, res) => {
-    return thesaurisModel.get()
+    let action = thesaurisModel.get.bind(thesaurisModel, req.language);
+    if (req.query && req.query._id) {
+      action = thesaurisModel.getById.bind(thesaurisModel, req.query._id);
+    }
+    return action()
     .then((response) => {
       res.json(response);
     }).catch((error) => {

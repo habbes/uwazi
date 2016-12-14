@@ -7,7 +7,7 @@ import templatesModel from 'api/templates/templatesModel';
 import {catchErrors} from 'api/utils/jasmineHelpers';
 import neo4jdb from 'api/utils/neo4jdb.js';
 
-fdescribe('templates routes', () => {
+describe('templates routes', () => {
   let routes;
 
   beforeEach((done) => {

@@ -1,49 +1,71 @@
 import thesaurisModel from 'api/thesauris/thesaurisModel';
-import query from 'api/neo4j/query';
 import {catchErrors} from 'api/utils/jasmineHelpers';
+import fixtures from './fixtures';
+import neo4jdb from 'api/utils/neo4jdb.js';
 
 describe('Thesauris model', () => {
 
   beforeEach((done) => {
-    query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
-    .then(() => {
-      return query('CREATE (d:Dictionary {name: "Countries"}), ' +
-                   '(p0:DictionaryValue {label: "Spain", id: "abc2"}), ' +
-                   '(p1:DictionaryValue {label: "Ecuador", id: "abc3"}), ' +
-                   '(d)-[:VALUE]->(p0), ' +
-                   '(d)-[:VALUE]->(p1), ' +
-                   '(t:Template {name: "Mechanism", isEntity: true}), ' +
-                   '(t2:Template {name: "Judges", isEntity: true}), ' +
-                   '(e:Entity {title: "National Court", sharedId: "abc1", icon: "Something"}), ' +
-                   '(e)-[:TEMPLATE]->(t)');
-    })
-    .then(() => {
-      done();
-    })
-    .catch(catchErrors(done));
+    neo4jdb.resetTestingDatabase()
+    .then(() => neo4jdb.import(fixtures))
+    .then(done);
   });
 
   describe('get', () => {
     it('should return Dictionaries and Templates nodes with its properties', (done) => {
-      thesaurisModel.get()
+      thesaurisModel.get('es')
       .then((response) => {
-        expect(response.rows[0].name).toEqual('Countries');
-        expect(response.rows[0].values[0].label).toBe('Ecuador');
-        expect(response.rows[0].values[0].id).toBe('abc3');
-        expect(response.rows[0].values[1].label).toBe('Spain');
-        expect(response.rows[0].values[1].id).toBe('abc2');
+        const thesauris = response.rows;
 
-        expect(response.rows[2].name).toBe('Mechanism');
-        expect(response.rows[2].values[0].label).toBe('National Court');
-        expect(response.rows[2].values[0].id).toBe('abc1');
-        expect(response.rows[2].values[0].icon).toBe('Something');
+        const countries = thesauris.find(t => t.name === 'Countries');
+        expect(countries.values).toContain({label: 'Ecuador', id: 'abc3', icon: null});
+        expect(countries.values).toContain({label: 'Spain', id: 'abc2', icon: null});
 
-        expect(response.rows[1].name).toBe('Judges');
-        expect(response.rows[1].values).toEqual([]);
+        const mechanism = thesauris.find(t => t.name === 'Mechanism');
+        expect(mechanism.values[0]).toEqual({label: 'Corte Nacional', id: 'abc1', icon: 'Something'});
+        expect(mechanism.values[1]).toEqual({label: 'spanish', id: 'abc2', icon: null});
+        expect(mechanism.values.length).toBe(2);
+
+        const judges = thesauris.find(t => t.name === 'Judges');
+        expect(judges.values).toEqual([]);
+
+        const types = thesauris.find(t => t.name === 'Types');
+        expect(types.values).toEqual([]);
 
         done();
       })
       .catch(catchErrors(done));
+    });
+  });
+
+  describe('getById', () => {
+    it('should return the matching Dictionary with its values', (done) => {
+      thesaurisModel.getById('countries')
+      .then((response) => {
+        const thesauri = response.rows[0];
+
+        expect(thesauri.name).toBe('Countries');
+        expect(thesauri.values).toContain({label: 'Ecuador', id: 'abc3', icon: null});
+        expect(thesauri.values).toContain({label: 'Spain', id: 'abc2', icon: null});
+
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    describe('when dictionary has no values', () => {
+      it('should return the matching Dictionary with empty values', (done) => {
+        thesaurisModel.getById('types')
+        .then((response) => {
+          const thesauri = response.rows[0];
+
+          expect(thesauri.name).toBe('Types');
+          expect(thesauri.values).toEqual([]);
+
+          done();
+        })
+        .catch(catchErrors(done));
+      });
     });
   });
 
