@@ -14,10 +14,11 @@ let executeRoute = (method, routePath, req = {}, res, app) => {
       resolve(response);
     });
 
-    res.json = jasmine.createSpy('json').and.callFake((response) => {
-      if (statusCode) {
-        response.status = statusCode;
+    res.json = jasmine.createSpy('json').and.callFake((response, _status) => {
+      if (statusCode || _status) {
+        response.status = statusCode || _status;
       }
+
       resolve(response);
     });
 

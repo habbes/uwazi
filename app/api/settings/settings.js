@@ -52,18 +52,13 @@ function saveFiltersTranslations(_newFilters = [], _currentFilters = []) {
 
 export default {
   get() {
-    // return request.get(`${dbURL}/_design/settings/_view/all`)
-    // .then((result) => {
-    //   if (result.json.rows.length) {
-    //     return result.json.rows[0].value;
-    //   }
-    //
-    //   return {};
-    // });
-    let SettingsModel = model('Settings');
-    return SettingsModel.get()
-    .then((response) => {
-      return response.rows[0] || {};
+    return request.get(`${dbURL}/_design/settings/_view/all`)
+    .then((result) => {
+      if (result.json.rows.length) {
+        return result.json.rows[0].value;
+      }
+
+      return {};
     });
   },
 

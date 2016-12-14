@@ -9,7 +9,6 @@ export default {
 
     return api.get(url)
     .then((response) => {
-      console.log(response.json.rows);
       return response.json.rows;
     });
   },

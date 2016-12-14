@@ -2,7 +2,7 @@ import thesaurisModel from 'api/thesauris/thesaurisModel';
 import query from 'api/neo4j/query';
 import {catchErrors} from 'api/utils/jasmineHelpers';
 
-fdescribe('Thesauris model', () => {
+describe('Thesauris model', () => {
 
   beforeEach((done) => {
     query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')

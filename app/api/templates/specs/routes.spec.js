@@ -3,15 +3,17 @@ import database from 'api/utils/database.js';
 import fixtures from './fixtures.js';
 import instrumentRoutes from 'api/utils/instrumentRoutes';
 import templates from 'api/templates/templates';
+import templatesModel from 'api/templates/templatesModel';
 import {catchErrors} from 'api/utils/jasmineHelpers';
+import neo4jdb from 'api/utils/neo4jdb.js';
 
-describe('templates routes', () => {
+fdescribe('templates routes', () => {
   let routes;
 
   beforeEach((done) => {
     routes = instrumentRoutes(templateRoutes);
-    database.reset_testing_database()
-    .then(() => database.import(fixtures))
+    neo4jdb.resetTestingDatabase()
+    .then(() => neo4jdb.import(fixtures))
     .then(done)
     .catch(catchErrors(done));
   });
@@ -21,7 +23,8 @@ describe('templates routes', () => {
       routes.get('/api/templates')
       .then((response) => {
         let docs = response.rows;
-        expect(docs[0].name).toBe('template_test');
+        expect(docs[0].name).toBe('Mechanism');
+        expect(docs[1].name).toBe('Judge');
         done();
       })
       .catch(catchErrors(done));
@@ -29,12 +32,12 @@ describe('templates routes', () => {
 
     describe('when passing id', () => {
       it('should return matching template', (done) => {
-        let req = {query: {_id: 'c08ef2532f0bd008ac5174b45e033c94'}};
+        let req = {query: {_id: 'abc2'}};
 
         routes.get('/api/templates', req)
         .then((response) => {
           let docs = response.rows;
-          expect(docs[0].name).toBe('template_test2');
+          expect(docs[0].name).toBe('Mechanism');
           done();
         })
         .catch(catchErrors(done));
@@ -48,8 +51,8 @@ describe('templates routes', () => {
         database.reset_testing_database()
         .then(() => routes.get('/api/templates', req))
         .then((response) => {
-          let error = response.error;
-          expect(error.error).toBe('not_found');
+          expect(response.status).toBe(500);
+          expect(response.error).toBe('not_found');
           done();
         })
         .catch(catchErrors(done));
@@ -59,10 +62,10 @@ describe('templates routes', () => {
 
   describe('DELETE', () => {
     it('should delete a template', (done) => {
-      spyOn(templates, 'delete').and.returnValue(Promise.resolve('ok'));
+      spyOn(templatesModel, 'delete').and.returnValue(Promise.resolve('ok'));
       routes.delete('/api/templates', {query: 'template'})
       .then((response) => {
-        expect(templates.delete).toHaveBeenCalledWith('template');
+        expect(templatesModel.delete).toHaveBeenCalledWith('template');
         expect(response).toBe('ok');
         done();
       })
@@ -71,11 +74,11 @@ describe('templates routes', () => {
 
     describe('when there is a db error', () => {
       it('should return the error in the response', (done) => {
-        let req = {query: {_id: 'c08ef2532f0bd008ac5174b45e033c93', _rev: 'bad_rev'}};
-
-        routes.delete('/api/templates', req)
+        spyOn(templatesModel, 'delete').and.returnValue(Promise.reject({error: 'All your base belongs to us'}));
+        routes.delete('/api/templates', {query: 'template'})
         .then((response) => {
-          expect(response.error.error).toBe('bad_request');
+          expect(response.status).toBe(500);
+          expect(response.error).toBe('All your base belongs to us');
           done();
         })
         .catch(catchErrors(done));
@@ -85,13 +88,13 @@ describe('templates routes', () => {
 
   describe('POST', () => {
     it('should create a template', (done) => {
-      spyOn(templates, 'save').and.returnValue(new Promise((resolve) => resolve('response')));
+      spyOn(templatesModel, 'save').and.returnValue(new Promise((resolve) => resolve({response: 'response'})));
       let req = {body: {name: 'created_template', properties: [{label: 'fieldLabel'}]}};
 
       routes.post('/api/templates', req)
       .then((response) => {
-        expect(response).toBe('response');
-        expect(templates.save).toHaveBeenCalledWith(req.body);
+        expect(response.response).toBe('response');
+        expect(templatesModel.save).toHaveBeenCalledWith(req.body);
         done();
       })
       .catch(catchErrors(done));
@@ -99,11 +102,12 @@ describe('templates routes', () => {
 
     describe('when there is a db error', () => {
       it('should return the error in the response', (done) => {
-        spyOn(templates, 'save').and.returnValue(new Promise((resolve, reject) => reject('error')));
+        spyOn(templatesModel, 'save').and.returnValue(new Promise((resolve, reject) => reject({error: 'not_found'})));
         let req = {body: {}};
         routes.post('/api/templates', req)
-        .then((error) => {
-          expect(error.error).toBe('error');
+        .then((response) => {
+          expect(response.status).toBe(500);
+          expect(response.error).toBe('not_found');
           done();
         })
         .catch(catchErrors(done));
@@ -119,19 +123,6 @@ describe('templates routes', () => {
       .then((result) => {
         expect(result).toBe(2);
         expect(templates.countByThesauri).toHaveBeenCalledWith('abc1');
-        done();
-      })
-      .catch(catchErrors(done));
-    });
-  });
-
-  describe('/templates/select_options', () => {
-    it('should return the number of templates using a thesauri', (done) => {
-      spyOn(templates, 'selectOptions').and.returnValue(Promise.resolve('options'));
-      let req = {};
-      routes.get('/api/templates/select_options', req)
-      .then((result) => {
-        expect(result).toBe('options');
         done();
       })
       .catch(catchErrors(done));

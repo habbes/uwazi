@@ -4,20 +4,20 @@ import ID from 'shared/uniqueID';
 function processRecord(_record) {
   let record = _record.toObject();
   let properties = {properties: record.properties.map((prop) => {
-    if (prop.properties.nestedProperties) {
-      prop.properties.nestedProperties = JSON.parse(prop.properties.nestedProperties);
+    if (prop.nestedProperties) {
+      prop.nestedProperties = JSON.parse(prop.nestedProperties);
     }
-    return prop.properties;
+    return prop;
   })};
-  return Object.assign(record._props, properties, {actualProps: record.actualProps});
+  return Object.assign(record._props, properties);
 }
 
 const templatesModel = {
   get: () => {
-    return query('MATCH (n:Template)-[r:PROPERTY]->(p:TemplateProperty) ' +
-                 'WITH n, {properties: properties(p)} as prop ' +
-                 'ORDER BY p.order ASC ' +
-                 'RETURN properties(n) AS _props, collect(prop) as properties')
+    return query('MATCH (n:Template)' +
+                 'WITH n OPTIONAL MATCH (n)-[:PROPERTY]->(p) ' +
+                 'WITH n,p ORDER BY p.order ASC ' +
+                 'RETURN properties(n) AS _props, collect(properties(p)) as properties')
     .then((response) => {
       return {
         rows: response.records.map(processRecord)
@@ -26,13 +26,13 @@ const templatesModel = {
   },
 
   getById: (id) => {
-    return query('MATCH (n:Template)-[r:PROPERTY]->(p:TemplateProperty) ' +
-                 `WHERE n._id="${id}" ` +
-                 'WITH n, {properties: properties(p)} as prop ' +
-                 'ORDER BY p.order ASC ' +
-                 'RETURN properties(n) AS _props, collect(prop) as properties')
+    const queryString = `MATCH (n:Template) WHERE n._id="${id}"` +
+                        'WITH n OPTIONAL MATCH (n)-[:PROPERTY]->(p) ' +
+                        'WITH n,p ORDER BY p.order ASC ' +
+                        'RETURN properties(n) AS _props, collect(properties(p)) as properties';
+    return query(queryString)
     .then((response) => {
-      return processRecord(response.records[0]);
+      return response.records.length ? {rows: response.records.map(processRecord)} : Promise.reject({error: 'not_found'});
     });
   },
 
@@ -48,16 +48,23 @@ const templatesModel = {
     });
     delete template.properties;
     let queryString = 'MERGE (t:Template {_id: {template}._id}) SET t = {template} ' +
-                      'WITH t MATCH (t)-[:PROPERTY]->(p) DETACH DELETE p ' +
+                      'WITH t OPTIONAL MATCH (t)-[:PROPERTY]->(f:TemplateProperty) DETACH DELETE f ' +
                       'WITH t UNWIND {properties} as prop ' +
                       'MERGE (p:TemplateProperty {_id: prop._id}) SET p = prop ' +
                       'MERGE (t)-[:PROPERTY]->(p) ' +
-                      'WITH t, {properties: properties(p)} as prop ' +
-                      'ORDER BY prop.order ASC ' +
-                      'RETURN properties(t) AS _props, collect(prop) as properties';
+                      'WITH t, p ' +
+                      'ORDER BY p.order ASC ' +
+                      'RETURN properties(t) AS _props, collect(properties(p)) as properties';
     return query(queryString, {template, properties})
     .then((response) => {
       return processRecord(response.records[0]);
+    });
+  },
+
+  delete: (id) => {
+    return query(`MATCH (t:Template {_id: "${id}"}) WITH t OPTIONAL MATCH (t)-[:PROPERTY]->(p) DETACH DELETE t,p`)
+    .then(() => {
+      return 'ok';
     });
   }
 };

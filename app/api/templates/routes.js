@@ -4,50 +4,41 @@ import templatesModel from './templatesModel';
 
 export default app => {
   app.post('/api/templates', needsAuthorization, (req, res) => {
-    // templates.save(req.body)
-    // .then((response) => {
-    //   res.json(response);
-    // })
-    // .catch((error) => {
-    //   res.json({error});
-    // });
-
     return templatesModel.save(req.body)
-    .then((response) => {
-      res.json(response);
-    });
-  });
-
-  app.get('/api/templates', (req, res) => {
-    // let id = '';
-    // if (req.query && req.query._id) {
-    //   id = '?key="' + req.query._id + '"';
-    // }
-    //
-    // let url = dbURL + '/_design/templates/_view/all' + id;
-    //
-    // request.get(url)
-    // .then((response) => {
-    //   response.json.rows = response.json.rows.map((row) => row.value);
-    //   res.json(response.json);
-    // })
-    // .catch((error) => {
-    //   res.json({error: error.json});
-    // });
-
-    return templatesModel.get()
-    .then((response) => {
-      res.json(response);
-    });
-  });
-
-  app.delete('/api/templates', needsAuthorization, (req, res) => {
-    templates.delete(req.query)
     .then((response) => {
       res.json(response);
     })
     .catch((error) => {
-      res.json({error: error.json});
+      res.json(error, 500);
+    });
+  });
+
+  app.get('/api/templates', (req, res) => {
+    if (req.query && req.query._id) {
+      return templatesModel.getById(req.query._id)
+      .then((response) => {
+        res.json(response);
+      })
+      .catch((error) => {
+        res.json(error, 500);
+      });
+    }
+
+    return templatesModel.get()
+    .then((response) => {
+      res.json(response);
+    }).catch((error) => {
+      res.json(error, 500);
+    });
+  });
+
+  app.delete('/api/templates', needsAuthorization, (req, res) => {
+    templatesModel.delete(req.query)
+    .then((response) => {
+      res.json(response);
+    })
+    .catch((error) => {
+      res.json(error, 500);
     });
   });
 
@@ -56,9 +47,5 @@ export default app => {
     .then((response) => {
       res.json(response);
     });
-  });
-
-  app.get('/api/templates/select_options', (req, res) => {
-    templates.selectOptions().then((response) => res.json(response));
   });
 };

@@ -1,32 +1,25 @@
 import templatesModel from 'api/templates/templatesModel';
 import query from 'api/neo4j/query';
 import {catchErrors} from 'api/utils/jasmineHelpers';
+import fixtures from './fixtures';
+import neo4jdb from 'api/utils/neo4jdb.js';
 
-fdescribe('templates model', () => {
+describe('templates model', () => {
   beforeEach((done) => {
-    query('MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r')
-    .then(() => {
-      return query('CREATE (t:Template {name: "Judge", _id: "abc1"}), ' +
-                   '(p0:TemplateProperty {name: "Name", order: 2, _id: "p0"}), ' +
-                   '(p1:TemplateProperty {name:"Surname", order: 0, _id: "p1"}), ' +
-                   '(p2:TemplateProperty {name:"Dob", order: 1, _id: "p2"}), ' +
-                   '(t)-[:PROPERTY]->(p0), ' +
-                   '(t)-[:PROPERTY]->(p1), ' +
-                   '(t)-[:PROPERTY]->(p2)');
-    })
-    .then(() => {
-      done();
-    });
+    neo4jdb.resetTestingDatabase()
+    .then(() => neo4jdb.import(fixtures))
+    .then(done);
   });
 
   describe('get', () => {
     it('should return Templates nodes with its properties', (done) => {
       templatesModel.get()
       .then((response) => {
-        expect(response.rows[0].name).toEqual('Judge');
-        expect(response.rows[0].properties[0].name).toBe('Surname');
-        expect(response.rows[0].properties[1].name).toBe('Dob');
-        expect(response.rows[0].properties[2].name).toBe('Name');
+        expect(response.rows[0].name).toEqual('Mechanism');
+        expect(response.rows[1].name).toEqual('Judge');
+        expect(response.rows[1].properties[0].name).toBe('Surname');
+        expect(response.rows[1].properties[1].name).toBe('Dob');
+        expect(response.rows[1].properties[2].name).toBe('Name');
 
         done();
       })
@@ -34,7 +27,7 @@ fdescribe('templates model', () => {
     });
   });
 
-  fdescribe('save', () => {
+  describe('save', () => {
     it('should create a Template with its properties', (done) => {
       let template = {name: 'Mechanism', properties: [{name: 'Name'}, {name: 'Country'}]};
       templatesModel.save(template)
@@ -49,16 +42,33 @@ fdescribe('templates model', () => {
     });
 
     it('should update an existing Template with its properties', (done) => {
-      templatesModel.getById("abc1")
-      .then((template) => {
+      templatesModel.getById('abc1')
+      .then((response) => {
+        let template = response.rows[0];
         template.properties[1].name = 'Date of birth';
         template.properties.splice(0, 1);
         return templatesModel.save(template);
       })
-      .then(() => templatesModel.getById("abc1"))
-      .then((template) => {
+      .then(() => templatesModel.getById('abc1'))
+      .then((response) => {
+        let template = response.rows[0];
         expect(template.properties.length).toBe(2);
         expect(template.properties[0].name).toBe('Date of birth');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete the template and return "ok"', (done) => {
+      templatesModel.delete('abc1')
+      .then((response) => {
+        expect(response).toBe('ok');
+        return query('MATCH (n) RETURN count(n) as count');
+      })
+      .then((response) => {
+        expect(response.records[0].get('count').toInt()).toBe(1);
         done();
       })
       .catch(catchErrors(done));

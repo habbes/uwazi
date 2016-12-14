@@ -2,7 +2,7 @@ import model from 'api/neo4j/model';
 import query from 'api/neo4j/query';
 import {catchErrors} from 'api/utils/jasmineHelpers';
 
-fdescribe('neo4j model', () => {
+describe('neo4j model', () => {
   let testModel = model('SuperHero');
 
   beforeEach((done) => {
