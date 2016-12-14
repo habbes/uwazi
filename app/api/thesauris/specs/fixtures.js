@@ -10,6 +10,7 @@ export default {
     '(d2:Dictionary {name: "Types", _id: "types"})',
     '(p0:DictionaryValue {label: "Spain", id: "abc2"})',
     '(p1:DictionaryValue {label: "Ecuador", id: "abc3"})',
+    '(p2:DictionaryValue {label: "Orphan", id: "abc4"})',
     '(d)-[:VALUE]->(p0)',
     '(d)-[:VALUE]->(p1)',
     '(t:Template {name: "Mechanism", isEntity: true})',

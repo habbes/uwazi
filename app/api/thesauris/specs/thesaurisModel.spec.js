@@ -2,6 +2,7 @@ import thesaurisModel from 'api/thesauris/thesaurisModel';
 import {catchErrors} from 'api/utils/jasmineHelpers';
 import fixtures from './fixtures';
 import neo4jdb from 'api/utils/neo4jdb.js';
+import query from 'api/neo4j/query';
 
 describe('Thesauris model', () => {
 
@@ -70,13 +71,33 @@ describe('Thesauris model', () => {
   });
 
   describe('save', () => {
-    it('should create a Template with its properties', (done) => {
+    it('should create a Dictionary with its values', (done) => {
       let dictionary = {name: 'SuprHeroes', values: [{label: 'Robin'}, {label: 'Batman'}]};
       thesaurisModel.save(dictionary)
       .then((response) => {
         expect(response.name).toEqual('SuprHeroes');
         expect(response.values[0].label).toBe('Batman');
         expect(response.values[1].label).toBe('Robin');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+  });
+
+  describe('delete', () => {
+    fit('should delete a Dictionary and its related values', (done) => {
+      thesaurisModel.delete('countries')
+      .then(response => {
+        expect(response).toBe('ok');
+
+        return Promise.all([
+          query('MATCH (d:Dictionary {_id: "countries"}) return d'),
+          query('MATCH (v:DictionaryValue) return v')
+        ]);
+      })
+      .then(([dictionaries, values]) => {
+        expect(dictionaries.records.length).toBe(0);
+        expect(values.records.length).toBe(1);
         done();
       })
       .catch(catchErrors(done));

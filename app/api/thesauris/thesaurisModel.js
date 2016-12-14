@@ -72,8 +72,14 @@ const thesaurisModel = {
     return query(queryString, {dictionary, values})
     .then((response) => {
       return processDictionary(response.records[0]);
-    })
-    .catch(console.log);
+    });
+  },
+
+  delete: (id) => {
+    return query(`MATCH (d:Dictionary {_id: "${id}"}) WITH d OPTIONAL MATCH (d)-[:VALUE]->(v) DETACH DELETE d,v`)
+    .then(() => {
+      return 'ok';
+    });
   }
 };
 

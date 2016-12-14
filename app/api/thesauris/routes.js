@@ -41,12 +41,10 @@ export default app => {
   });
 
   app.delete('/api/thesauris', needsAuthorization, (req, res) => {
-    thesauris.delete(req.query._id, req.query._rev)
-    .then((response) => {
-      res.json(response);
-    })
-    .catch((error) => {
-      res.json({error: error.json});
+    thesaurisModel.delete(req.query._id)
+    .then(res.json)
+    .catch(error => {
+      res.json(error, 500);
     });
   });
 };

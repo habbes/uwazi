@@ -49,14 +49,17 @@ describe('thesauris routes', () => {
     });
 
     describe('when there is a db error', () => {
-      it('return the error in the response', (done) => {
-        let req = {query: {_id: 'non_existent_id'}, language: 'es'};
+      beforeEach(() => {
+        spyOn(thesaurisModel, 'get').and.returnValue(Promise.reject({error: 'error'}));
+      });
 
-        database.reset_testing_database()
-        .then(() => routes.get('/api/thesauris', req))
-        .then((response) => {
-          let error = response.error;
-          expect(error.error).toBe('not_found');
+      it('return the error in the response', (done) => {
+        let req = {language: 'es'};
+
+        routes.get('/api/thesauris', req)
+        .then(response => {
+          expect(response.error).toBe('error');
+          expect(response.status).toBe(500);
           done();
         })
         .catch(done.fail);
@@ -64,16 +67,31 @@ describe('thesauris routes', () => {
     });
   });
 
-  describe('DELETE', () => {
+  fdescribe('DELETE', () => {
     it('should delete a thesauri', (done) => {
-      spyOn(thesaurisModel, 'delete').and.returnValue(Promise.resolve());
-      let req = {query: {_id: 'abc', _rev: '123'}};
+      spyOn(thesaurisModel, 'delete').and.returnValue(Promise.resolve('ok'));
+      let req = {query: {_id: 'abc'}};
       return routes.delete('/api/thesauris', req)
-      .then(() => {
-        expect(thesaurisModel.delete).toHaveBeenCalledWith('abc', '123');
+      .then(response => {
+        expect(response).toBe('ok');
+        expect(thesaurisModel.delete).toHaveBeenCalledWith('abc');
         done();
       })
       .catch(done.fail);
+    });
+
+    describe('When error', () => {
+      it('should respond and error with status 500', (done) => {
+        spyOn(thesaurisModel, 'delete').and.returnValue(Promise.reject({error: 'error'}));
+        let req = {query: {_id: 'abc'}};
+        return routes.delete('/api/thesauris', req)
+        .then(response => {
+          expect(response.error).toBe('error');
+          expect(response.status).toBe(500);
+          done();
+        })
+        .catch(done.fail);
+      });
     });
   });
 
