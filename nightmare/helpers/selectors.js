@@ -43,10 +43,19 @@ export default {
     libraryFirstDocument: '#app > div.content > div > div > main > div > div.item-group > div',
     librarySecondDocument: '#app > div.content > div > div > main > div > div.item-group > div:nth-child(2)',
     librarySecondDocumentTitle: '#app > div.content > div > div > main > div > div.item-group > div:nth-child(2) > div.item-info > div',
+    libraryFirstDocumentTitle: '#app > div.content > div > div > main > div > div.item-group > div > div.item-info > div',
     searchInLibrary: '#app > div.content > header > div > a',
     searchInput: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-body > div.search-box > form > div.input-group > input',
+    clearSearchInput: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-body > div.search-box > form > div.input-group.is-active > span > div',
+    searchButton: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-footer > button',
     firstSearchSuggestion: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-body > div.search-box > form > div.search-suggestions > p:nth-child(1) > a',
-    firstDocumentViewButton: '#app > div.content > div > div > main > div > div.item-group > div:nth-child(1) > div.item-actions > a'
+    firstDocumentViewButton: '#app > div.content > div > div > main > div > div.item-group > div:nth-child(1) > div.item-actions > a',
+    comicCharacterCheckBox: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-body > div.documentTypes-selector > ul > li:nth-child(3) > label > i.multiselectItem-icon.fa.fa-square-o',
+    superVillianCheckBox: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-body > div.documentTypes-selector > ul > li:nth-child(4) > label',
+    obliterateSpeciesCheckBox: '#filtersForm > div > ul > li.wide > ul > li:nth-child(7) > label',
+    flyCheckBox: '#filtersForm > div > ul > li.wide > ul > li:nth-child(2) > label',
+    resetSearch: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-footer > span',
+    expandCheckBoxesList: '<button class="btn btn-xs btn-default"><i class="fa fa-caret-down"></i><span><!-- react-text: 902 -->Show <!-- /react-text --><!-- react-text: 903 -->2 more<!-- /react-text --></span></button>'
   },
   documentView: {
     viewer: '#app > div.content > div > div > main',

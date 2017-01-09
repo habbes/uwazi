@@ -7,7 +7,11 @@ import {catchErrors} from 'api/utils/jasmineHelpers';
 
 realMouse(Nightmare);
 
-describe('filters path', () => {
+let getInnerText = (selector) => {
+  return document.querySelector(selector).innerText;
+};
+
+fdescribe('filters path', () => {
   let nightmare = new Nightmare({show: true, typeInterval: 10}).viewport(1100, 600);
 
   describe('login', () => {
@@ -25,7 +29,7 @@ describe('filters path', () => {
     });
   });
 
-  describe('Filters tests', () => {
+  describe('Filters settings tests', () => {
     it('should click Filters button and then click on Create Group button', (done) => {
       nightmare
       .waitToClick(selectors.settingsView.filtersButton)
@@ -61,6 +65,70 @@ describe('filters path', () => {
       .exists('.alert.alert-success')
       .then((result) => {
         expect(result).toBe(true);
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+  });
+
+  describe('library filters tests', () => {
+    it('should click on the library nav button', (done) => {
+      nightmare
+      .wait(3200)
+      .waitToClick(selectors.navigation.libraryNavButton)
+      .exists(selectors.libraryView.searchInput)
+      .then((result) => {
+        expect(result).toBe(true);
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    it('should perform a search for Batman', (done) => {
+      nightmare
+      .type(selectors.libraryView.searchInput, 'Daneryl')
+      .realClick(selectors.libraryView.searchButton)
+      .wait(100)
+      .evaluate(getInnerText, selectors.libraryView.libraryFirstDocumentTitle)
+      .then((result) => {
+        expect(result).toBe('Daneryl');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    it('should clear the search input by clicking the cross button', (done) => {
+      nightmare
+      .realClick(selectors.libraryView.searchInput)
+      .realClick(selectors.libraryView.clearSearchInput)
+      .evaluate(getInnerText, selectors.libraryView.searchInput)
+      .then((result) => {
+        expect(result).toBe('');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    it('should check the COMIC CHARACTER and FLY checkboxs to find Star Lord Wikipedia', (done) => {
+      nightmare
+      .waitToClick(selectors.libraryView.comicCharacterCheckBox)
+      .waitToClick(selectors.libraryView.flyCheckBox)
+      .evaluate(getInnerText, selectors.libraryView.librarySecondDocumentTitle)
+      .then((result) => {
+        expect(result).toBe('Star Lord Wikipedia');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    it('should reset the search and check the SUPER VILLIAN checkbox to find SCARECROW as first result', (done) => {
+      nightmare
+      .waitToClick(selectors.libraryView.resetSearch)
+      .waitToClick(selectors.libraryView.superVillianCheckBox)
+      .wait(100)
+      .evaluate(getInnerText, selectors.libraryView.libraryFirstDocumentTitle)
+      .then((result) => {
+        expect(result).toBe('Scarecrow');
         done();
       })
       .catch(catchErrors(done));
