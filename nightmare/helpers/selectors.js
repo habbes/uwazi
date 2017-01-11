@@ -53,9 +53,10 @@ export default {
     comicCharacterCheckBox: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-body > div.documentTypes-selector > ul > li:nth-child(3) > label > i.multiselectItem-icon.fa.fa-square-o',
     superVillianCheckBox: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-body > div.documentTypes-selector > ul > li:nth-child(4) > label',
     obliterateSpeciesCheckBox: '#filtersForm > div > ul > li.wide > ul > li:nth-child(7) > label',
-    flyCheckBox: '#filtersForm > div > ul > li.wide > ul > li:nth-child(2) > label',
+    flyCheckBoxOfComicChar: '#filtersForm > div > ul > li.wide > ul > li:nth-child(2) > label',
+    flyCheckBoxOfSuperVillian: '#filtersForm > div > ul > li.wide > ul > li:nth-child(3) > label',
     resetSearch: '#app > div.content > div > div > aside.side-panel.library-filters.is-hidden > div.sidepanel-footer > span',
-    expandCheckBoxesList: '<button class="btn btn-xs btn-default"><i class="fa fa-caret-down"></i><span><!-- react-text: 902 -->Show <!-- /react-text --><!-- react-text: 903 -->2 more<!-- /react-text --></span></button>'
+    expandCheckBoxesList: '#filtersForm > div > ul > li.wide > ul > li:nth-child(7) > button'
   },
   documentView: {
     viewer: '#app > div.content > div > div > main',

@@ -1,11 +1,8 @@
 /*eslint max-nested-callbacks: ["error", 10]*/
 import Nightmare from 'nightmare';
-import realMouse from 'nightmare-real-mouse';
 import config from '../helpers/config.js';
 import selectors from '../helpers/selectors.js';
 import {catchErrors} from 'api/utils/jasmineHelpers';
-
-realMouse(Nightmare);
 
 let getInnerText = (selector) => {
   return document.querySelector(selector).innerText;
@@ -59,6 +56,7 @@ fdescribe('filters path', () => {
 
     it('should delete the filters group', (done) => {
       nightmare
+      .wait(3200)
       .deleteItemFromList(selectors.settingsView.listOfFilterGroups, 'Test Group')
       .waitToClick(selectors.settingsView.saveFilterGroupButton)
       .wait('.alert.alert-success')
@@ -84,10 +82,10 @@ fdescribe('filters path', () => {
       .catch(catchErrors(done));
     });
 
-    it('should perform a search for Batman', (done) => {
+    it('should perform a search for Daneryl', (done) => {
       nightmare
       .type(selectors.libraryView.searchInput, 'Daneryl')
-      .realClick(selectors.libraryView.searchButton)
+      .waitToClick(selectors.libraryView.searchButton)
       .wait(100)
       .evaluate(getInnerText, selectors.libraryView.libraryFirstDocumentTitle)
       .then((result) => {
@@ -99,8 +97,8 @@ fdescribe('filters path', () => {
 
     it('should clear the search input by clicking the cross button', (done) => {
       nightmare
-      .realClick(selectors.libraryView.searchInput)
-      .realClick(selectors.libraryView.clearSearchInput)
+      .waitToClick(selectors.libraryView.searchInput)
+      .waitToClick(selectors.libraryView.clearSearchInput)
       .evaluate(getInnerText, selectors.libraryView.searchInput)
       .then((result) => {
         expect(result).toBe('');
@@ -112,7 +110,7 @@ fdescribe('filters path', () => {
     it('should check the COMIC CHARACTER and FLY checkboxs to find Star Lord Wikipedia', (done) => {
       nightmare
       .waitToClick(selectors.libraryView.comicCharacterCheckBox)
-      .waitToClick(selectors.libraryView.flyCheckBox)
+      .waitToClick(selectors.libraryView.flyCheckBoxOfComicChar)
       .evaluate(getInnerText, selectors.libraryView.librarySecondDocumentTitle)
       .then((result) => {
         expect(result).toBe('Star Lord Wikipedia');
@@ -129,6 +127,32 @@ fdescribe('filters path', () => {
       .evaluate(getInnerText, selectors.libraryView.libraryFirstDocumentTitle)
       .then((result) => {
         expect(result).toBe('Scarecrow');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    it('should expand the SUPER POWERS checkboxlist then check OBLITERATE SPECIES checkbox to find DANERYL as 2nd result', (done) => {
+      nightmare
+      .waitToClick(selectors.libraryView.expandCheckBoxesList)
+      .waitToClick(selectors.libraryView.flyCheckBoxOfSuperVillian)
+      .waitToClick(selectors.libraryView.obliterateSpeciesCheckBox)
+      .evaluate(getInnerText, selectors.libraryView.libraryFirstDocumentTitle)
+      .then((result) => {
+        expect(result).toBe('Daneryl');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    it('should perform a search for THANOS', (done) => {
+      nightmare
+      .type(selectors.libraryView.searchInput, 'Thanos')
+      .waitToClick(selectors.libraryView.searchButton)
+      .wait(100)
+      .evaluate(getInnerText, selectors.libraryView.libraryFirstDocumentTitle)
+      .then((result) => {
+        expect(result).toBe('Thanos');
         done();
       })
       .catch(catchErrors(done));
