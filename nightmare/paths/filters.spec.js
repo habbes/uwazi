@@ -8,7 +8,7 @@ let getInnerText = (selector) => {
   return document.querySelector(selector).innerText;
 };
 
-fdescribe('filters path', () => {
+describe('filters path', () => {
   let nightmare = new Nightmare({show: true, typeInterval: 10}).viewport(1100, 600);
 
   describe('login', () => {
