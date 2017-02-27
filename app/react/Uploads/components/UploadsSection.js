@@ -39,7 +39,7 @@ export class UploadsSection extends Component {
       <div className="row">
         <Helmet title={t('System', 'Uploads')}/>
         <main className={className}>
-          <UploadBox />
+          {/*<UploadBox />*/}
           <UploadsList socket={this.socket}/>
         </main>
         <UploadsFormPanel />

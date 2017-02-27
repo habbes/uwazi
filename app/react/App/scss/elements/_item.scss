@@ -44,7 +44,6 @@
   }
 
   &:hover{
-    cursor: pointer;
     border-color: $c-grey;
   }
   &.is-active,
@@ -131,7 +130,6 @@ $item-padding: 15px;
   text-overflow: ellipsis;
   white-space: nowrap;
   display: inline-block;
-  cursor: default;
 }
 
 .item-type-empty .item-type__icon  { color: $c-grey; }

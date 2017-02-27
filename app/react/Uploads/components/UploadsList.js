@@ -25,6 +25,10 @@ export class UploadsList extends Component {
 
     return (
       <RowList>
+        <div className="item upload-box">
+          <p><i className="fa fa-upload"></i> Drag and drop your files here for uploading</p>
+          <span className="upload-box_formats">Supported formats: PDF</span>
+        </div>
         {documents.map(doc => {
           if (doc.get('type') === 'document') {
             return <UploadDoc doc={doc} key={doc.get('_id')}/>;
