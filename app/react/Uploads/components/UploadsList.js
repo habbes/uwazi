@@ -3,12 +3,34 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
 import {RowList} from 'app/Layout/Lists';
+import Dropzone from 'react-dropzone';
 import UploadDoc from 'app/Uploads/components/UploadDoc';
 import UploadEntity from 'app/Uploads/components/UploadEntity';
-import {conversionComplete, updateDocument} from 'app/Uploads/actions/uploadsActions';
+import {conversionComplete, updateDocument, createDocument, finishEdit} from 'app/Uploads/actions/uploadsActions';
 
 
 export class UploadsList extends Component {
+
+  onDrop(files) {
+    files.forEach((file) => {
+      let doc = {title: this.extractTitle(file)};
+      this.props.createDocument(doc)
+      .then((newDoc) => {
+        this.props.uploadDocument(newDoc.sharedId, file);
+      });
+    });
+    this.props.finishEdit();
+  }
+
+  extractTitle(file) {
+    let title = file.name
+    .replace(/\.[^/.]+$/, '')
+    .replace(/_/g, ' ')
+    .replace(/-/g, ' ')
+    .replace(/ {2}/g, ' ');
+
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  }
 
   componentWillMount() {
     this.props.socket.on('documentProcessed', (docId) => {
@@ -24,19 +46,21 @@ export class UploadsList extends Component {
     const documents = this.props.documents.sort((a, b) => b.get('creationDate') - a.get('creationDate'));
 
     return (
-      <RowList>
-        <div className="item upload-box">
-          <p><i className="fa fa-upload"></i> Drag and drop your files here for uploading</p>
-          <span className="upload-box_formats">Supported formats: PDF</span>
-        </div>
-        {documents.map(doc => {
-          if (doc.get('type') === 'document') {
-            return <UploadDoc doc={doc} key={doc.get('_id')}/>;
-          }
+      <Dropzone style={{}} onDrop={this.onDrop.bind(this)} accept="application/pdf">
+        <RowList>
+          <div className="item upload-box">
+            <p><i className="fa fa-upload"></i> Drag and drop your files here for uploading</p>
+            <span className="upload-box_formats">Supported formats: PDF</span>
+          </div>
+          {documents.map(doc => {
+            if (doc.get('type') === 'document') {
+              return <UploadDoc doc={doc} key={doc.get('_id')}/>;
+            }
 
-          return <UploadEntity entity={doc} key={doc.get('_id')}/>;
-        })}
-      </RowList>
+            return <UploadEntity entity={doc} key={doc.get('_id')}/>;
+          })}
+        </RowList>
+      </Dropzone>
     );
   }
 }
@@ -46,7 +70,10 @@ UploadsList.propTypes = {
   progress: PropTypes.object,
   socket: PropTypes.object,
   conversionComplete: PropTypes.func,
-  updateDocument: PropTypes.func
+  updateDocument: PropTypes.func,
+  uploadDocument: PropTypes.func,
+  createDocument: PropTypes.func,
+  finishEdit: PropTypes.func
 };
 
 export function mapStateToProps(state) {
@@ -56,7 +83,7 @@ export function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({conversionComplete, updateDocument}, dispatch);
+  return bindActionCreators({conversionComplete, updateDocument, finishEdit, createDocument}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UploadsList);

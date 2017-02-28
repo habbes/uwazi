@@ -6,7 +6,7 @@ import ContextMenu from 'app/ContextMenu';
 
 import {enterUploads} from '../actions/uploadsActions';
 
-import UploadBox from './UploadBox';
+{/*import UploadBox from './UploadBox';*/}
 import UploadsList from './UploadsList';
 import UploadsFormPanel from './UploadsFormPanel';
 import UploadFailedModal from './UploadFailedModal';
