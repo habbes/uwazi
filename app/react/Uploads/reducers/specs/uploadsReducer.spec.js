@@ -55,6 +55,23 @@ describe('uploadsReducer', () => {
     });
   });
 
+  describe('ELEMENTS_CREATED', () => {
+    it('should insert the new documents and sort documents by date', () => {
+      let currentState = Immutable.fromJS([{title: '1', creationDate: 25}, {title: '2', creationDate: 35}]);
+      let doc = {title: '3', creationDate: 15};
+      currentState = uploadsReducer(currentState, {type: types.ELEMENTS_CREATED, docs: [doc]});
+
+      let anotherDoc = {title: '4', creationDate: 50};
+      let newState = uploadsReducer(currentState, {type: types.ELEMENTS_CREATED, docs: [anotherDoc]});
+      expect(newState).toEqualImmutable(Immutable.fromJS([
+        {title: '4', creationDate: 50},
+        {title: '2', creationDate: 35},
+        {title: '1', creationDate: 25},
+        {title: '3', creationDate: 15}
+      ]));
+    });
+  });
+
   describe('UPLOAD_COMPLETE', () => {
     it('should set uploaded flag to true for the document', () => {
       let currentState = Immutable.fromJS([{sharedId: 'id1', title: '1'}, {sharedId: 'id2', title: '2'}]);

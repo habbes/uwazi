@@ -4,6 +4,7 @@ import {notify} from 'app/Notifications';
 import * as types from 'app/Uploads/actions/actionTypes';
 import metadata from 'app/Metadata';
 import api from '../../utils/api';
+import P from 'bluebird'
 
 export function enterUploads() {
   return {
@@ -113,20 +114,54 @@ export function createDocument(newDoc) {
   };
 }
 
+function extractTitle(file) {
+  let title = file.name
+  .replace(/\.[^/.]+$/, '')
+  .replace(/_/g, ' ')
+  .replace(/-/g, ' ')
+  .replace(/ {2}/g, ' ');
+
+  return title.charAt(0).toUpperCase() + title.slice(1);
+}
+
 export function uploadDocument(docId, file) {
   return function (dispatch) {
     dispatch({type: types.NEW_UPLOAD_DOCUMENT, doc: docId});
-    superagent.post(APIURL + 'upload')
-    .set('Accept', 'application/json')
-    .field('document', docId)
-    .attach('file', file, file.name)
-    .on('progress', (data) => {
-      dispatch({type: types.UPLOAD_PROGRESS, doc: docId, progress: Math.floor(data.percent)});
-    })
-    .on('response', () => {
-      dispatch({type: types.UPLOAD_COMPLETE, doc: docId});
-    })
-    .end();
+    return new Promise((resolve) => {
+      superagent.post(APIURL + 'upload')
+      .set('Accept', 'application/json')
+      .field('document', docId)
+      .attach('file', file, file.name)
+      .on('progress', (data) => {
+        dispatch({type: types.UPLOAD_PROGRESS, doc: docId, progress: Math.floor(data.percent)});
+      })
+      .on('response', () => {
+        dispatch({type: types.UPLOAD_COMPLETE, doc: docId});
+        resolve();
+      })
+      .end();
+    });
+  };
+}
+
+export function createDocuments(files) {
+  return function (dispatch) {
+    return P.map(files, (file) => {
+      return api.post('documents', {title: extractTitle(file)})
+      .then((response) => {
+        return {doc: response.json, file: file};
+      });
+    }, {concurrency: 5})
+    .then((results) => {
+      const docs = results.map((result) => {
+        dispatch({type: types.NEW_UPLOAD_DOCUMENT, doc: result.doc.sharedId});
+        return result.doc;
+      });
+      dispatch({type: types.ELEMENTS_CREATED, docs: docs});
+      return P.map(results, (result) => {
+        return dispatch(uploadDocument(result.doc.sharedId, result.file));
+      }, {concurrency: 5});
+    });
   };
 }
 

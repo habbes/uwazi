@@ -8,7 +8,7 @@ let cookie;
 let locale;
 
 let handleError = (error) => {
-  if (error.status === 401) {
+  if (error.status === 401 && browserHistory) {
     browserHistory.replace('/login');
   }
 

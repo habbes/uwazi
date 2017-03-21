@@ -13,6 +13,13 @@ export default function documents(state = initialState, action = {}) {
     return state.push(Immutable.fromJS(action.doc)).sort((a, b) => b.get('creationDate') - a.get('creationDate'));
   }
 
+  if (action.type === types.ELEMENTS_CREATED) {
+    return action.docs.reduce((_state, doc) => {
+      return _state.push(Immutable.fromJS(doc));
+    }, state)
+    .sort((a, b) => b.get('creationDate') - a.get('creationDate'));
+  }
+
   if (action.type === types.UPLOAD_COMPLETE) {
     return state.update(state.findIndex(doc => doc.get('sharedId') === action.doc), (doc) => doc.set('uploaded', true));
   }

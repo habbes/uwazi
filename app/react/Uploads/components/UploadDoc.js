@@ -115,16 +115,16 @@ UploadDoc.propTypes = {
   templates: PropTypes.object
 };
 
-export function mapStateToProps({uploads, templates, user}, props) {
-  return {
-    active: !!uploads.uiState.get('selectedDocuments').find((doc) => doc.get('_id') === props.doc.get('_id')),
-    progress: uploads.progress.get(props.doc.get('sharedId')),
-    templates
-  };
-}
+// export function mapStateToProps({uploads, templates, user}, props) {
+//   return {
+//     active: !!uploads.uiState.get('selectedDocuments').find((doc) => doc.get('_id') === props.doc.get('_id')),
+//     progress: uploads.progress.get(props.doc.get('sharedId')),
+//     templates
+//   };
+// }
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({loadInReduxForm: actions.loadInReduxForm, showModal}, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UploadDoc);
+export default connect(null, mapDispatchToProps)(UploadDoc);

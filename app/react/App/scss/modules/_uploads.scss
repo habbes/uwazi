@@ -85,33 +85,48 @@
   }
 }
 
+.upload-progress-bar-container {
+  display: block;
+  position: relative;
+  max-width: 960px;
+  padding: 0;
+  margin: auto;
+  margin-bottom: 15px;
+  text-align: center;
+  color: $c-grey-dark;
+
+  .cs-loader {
+    height: 40px;
+  }
+}
+
 .is-uploaded {
-	opacity: 0;
-	transition: all 300ms;
-	position: relative;
-	top: 15px;
-	&.is-active {
-		opacity: 1;
-		top: 0;
-	}
+  opacity: 0;
+  transition: all 300ms;
+  position: relative;
+  top: 15px;
+  &.is-active {
+    opacity: 1;
+    top: 0;
+  }
 }
 
 .is-uploading {
-	position: absolute;
-	opacity: 0;
-	transition: all 300ms;
-	text-align: center;
-	font-size: $f-size-lg;
-	color: $c-grey-dark;
-	width: 600px;
-	&.is-active {
-		opacity: 0.4;
-	}
+  position: absolute;
+  opacity: 0;
+  transition: all 300ms;
+  text-align: center;
+  font-size: $f-size-lg;
+  color: $c-grey-dark;
+  width: 600px;
+  &.is-active {
+    opacity: 0.4;
+  }
 }
 
 .required {
-	position: relative;
-	top: -3px;
-	right: -3px;
-	color: red;
+  position: relative;
+  top: -3px;
+  right: -3px;
+  color: red;
 }
