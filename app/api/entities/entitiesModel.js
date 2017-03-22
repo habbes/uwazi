@@ -26,7 +26,11 @@ const entitySchema = new mongoose.Schema({
   }],
   attachments: [{
     originalname: String,
-    filename: String
+    filename: String,
+    size: Number,
+    origin: String,
+    encoding: String,
+    mimetype: String
   }],
   creationDate: Number,
   fullText: {type: String, select: false},

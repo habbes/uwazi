@@ -2,7 +2,6 @@ import {db_url as dbUrl} from '../config/database';
 import needsAuthorization from '../auth/authMiddleware';
 import multer from 'multer';
 import ID from 'shared/uniqueID';
-import request from '../../shared/JSONRequest';
 import fs from 'fs';
 
 import path from 'path';
@@ -37,7 +36,11 @@ export default (app) => {
     return entities.getById(req.body.entityId)
     .then(entity => {
       entity.attachments = entity.attachments || [];
-      entity.attachments.push(req.files[0]);
+
+      const attachment = req.files[0];
+      attachment.origin = req.body.origin || 'attachments';
+
+      entity.attachments.push(attachment);
       return entities.saveMultiple([entity]);
     })
     .then(() => {

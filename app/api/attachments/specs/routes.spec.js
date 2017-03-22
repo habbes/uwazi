@@ -52,14 +52,11 @@ describe('Attachments Routes', () => {
 
     beforeEach(() => {
       file = {
-        //fieldname: 'file',
         originalname: 'new original name.miss',
-        filename: 'mockfile.doc'
-        //encoding: '7bit',
-        //mimetype: 'application/octet-stream',
-        //destination: __dirname + '/uploads/',
-        //path: __dirname + '/uploads/mockfile.doc',
-        //size: 171411271
+        filename: 'mockfile.doc',
+        encoding: '7bit',
+        mimetype: 'application/octet-stream',
+        size: 171411271
       };
       req = {user: 'admin', headers: {}, body: {entityId}, files: [file]};
     });
@@ -75,9 +72,29 @@ describe('Attachments Routes', () => {
       })
       .then(([addedFile, dbEntity]) => {
         expect(dbEntity.attachments.length).toBe(3);
-        expect(dbEntity.attachments[2].filename).toEqual(file.filename);
-        expect(dbEntity.attachments[2].originalname).toEqual(file.originalname);
+        expect(dbEntity.attachments[2].filename).toBe(file.filename);
+        expect(dbEntity.attachments[2].originalname).toBe(file.originalname);
+        expect(dbEntity.attachments[2].encoding).toBe(file.encoding);
+        expect(dbEntity.attachments[2].mimetype).toBe(file.mimetype);
+        expect(dbEntity.attachments[2].size).toBe(file.size);
+        expect(dbEntity.attachments[2].origin).toBe('attachments');
         expect(addedFile.filename).toBe('mockfile.doc');
+        done();
+      })
+      .catch(catchErrors(done));
+    });
+
+    it('should add the uploaded file to attachments with passed origin', (done) => {
+      req.body.origin = 'metadata';
+
+      routes.post('/api/attachments/upload', req)
+      .then(() => {
+        return Promise.all([entities.getById(req.body.entityId)]);
+      })
+      .then(([dbEntity]) => {
+        expect(dbEntity.attachments.length).toBe(3);
+        expect(dbEntity.attachments[2].filename).toBe(file.filename);
+        expect(dbEntity.attachments[2].origin).toBe('metadata');
         done();
       })
       .catch(catchErrors(done));
