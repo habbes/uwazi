@@ -6,6 +6,7 @@ export default {
   date: 'fa fa-calendar fa-fw',
   text: 'fa fa-font fa-fw',
   markdown: 'fa fa-file-text-o fa-fw',
+  attachment: 'fa fa-paperclip fa-fw',
   nested: 'fa fa-cubes fa-fw',
   multidate: 'fa fa-calendar fa-fw',
   multidaterange: 'fa fa-calendar fa-fw'

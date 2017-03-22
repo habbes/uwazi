@@ -39,6 +39,7 @@ export class TemplateCreator extends Component {
               <PropertyOption label='Multi Select' type='multiselect'/>
               <PropertyOption label='Date' type='date'/>
               <PropertyOption label='Rich Text' type='markdown'/>
+              <PropertyOption label='Attachment' type='attachment'/>
               <ShowIf if={this.props.settings.collection.toJS().project === 'cejil'}>
                 <PropertyOption label='Violated articles' type='nested'/>
               </ShowIf>
