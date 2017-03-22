@@ -11,6 +11,7 @@ export function uploadAttachment(entityId, file) {
     superagent.post(APIURL + 'attachments/upload')
     .set('Accept', 'application/json')
     .field('entityId', entityId)
+    .field('origin', 'attachments')
     .attach('file', file, file.name)
     .on('progress', (data) => {
       dispatch({type: types.ATTACHMENT_PROGRESS, entity: entityId, progress: Math.floor(data.percent)});
