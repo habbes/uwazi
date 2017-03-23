@@ -42,7 +42,7 @@ describe('Attachments actions', () => {
       expect(store.getActions()).toEqual([{type: types.START_UPLOAD_ATTACHMENT, entity: 'id'}]);
     });
 
-    it('should create upload the file while dispatching the upload progress', () => {
+    it('should upload the file while dispatching the upload progress', () => {
       const expectedActions = [
         {type: types.START_UPLOAD_ATTACHMENT, entity: 'id'},
         {type: types.ATTACHMENT_PROGRESS, entity: 'id', progress: 55},
@@ -52,12 +52,19 @@ describe('Attachments actions', () => {
 
       store.dispatch(actions.uploadAttachment('id', file));
       expect(mockUpload.field).toHaveBeenCalledWith('entityId', 'id');
+      expect(mockUpload.field).toHaveBeenCalledWith('origin', 'attachments');
       expect(mockUpload.attach).toHaveBeenCalledWith('file', file, file.name);
 
       mockUpload.emit('progress', {percent: 55.1});
       mockUpload.emit('progress', {percent: 65});
       mockUpload.emit('response', {text: '{"text": "file"}'});
       expect(store.getActions()).toEqual(expectedActions);
+    });
+
+    it('should upload the file with custom origin', () => {
+      store.dispatch(actions.uploadAttachment('id', file, 'metadata'));
+      expect(mockUpload.field).toHaveBeenCalledWith('entityId', 'id');
+      expect(mockUpload.field).toHaveBeenCalledWith('origin', 'metadata');
     });
   });
 

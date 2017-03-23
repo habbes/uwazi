@@ -5,13 +5,13 @@ import {notify} from 'app/Notifications/actions/notificationsActions';
 
 import * as types from './actionTypes';
 
-export function uploadAttachment(entityId, file) {
+export function uploadAttachment(entityId, file, origin) {
   return function (dispatch) {
     dispatch({type: types.START_UPLOAD_ATTACHMENT, entity: entityId});
     superagent.post(APIURL + 'attachments/upload')
     .set('Accept', 'application/json')
     .field('entityId', entityId)
-    .field('origin', 'attachments')
+    .field('origin', origin ? origin : 'attachments')
     .attach('file', file, file.name)
     .on('progress', (data) => {
       dispatch({type: types.ATTACHMENT_PROGRESS, entity: entityId, progress: Math.floor(data.percent)});
