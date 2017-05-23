@@ -37,6 +37,7 @@ export default class DatePicker extends Component {
     return (
         <DatePickerComponent
           dateFormat="MMM DD, YYYY"
+          placeholderText="MMM DD, YYYY"
           className="form-control"
           onChange={this.onChange.bind(this)}
           selected={this.state.value}
