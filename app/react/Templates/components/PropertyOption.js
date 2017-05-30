@@ -16,12 +16,10 @@ export class PropertyOption extends Component {
     return (
       connectDragSource(
         <li className="list-group-item">
-          <div>
-            <button className="btn btn-default btn-sm">
-              <i className="fa fa-chevron-left"></i>
-            </button>
-            <i className={iconClass}></i>{label}
-          </div>
+          <button className="btn btn-default btn-sm">
+            <i className="fa fa-chevron-left"></i>
+          </button>
+          <span><i className={iconClass}></i>{label}</span>
         </li>
       )
     );

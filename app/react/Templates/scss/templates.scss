@@ -79,6 +79,10 @@
 
 .metadataTemplate-constructor {
   .list-group-item {
+    -webkit-justify-content: flex-start !important;
+    justify-content: flex-start !important;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
     margin: 4px 7px;
     padding: 0 !important;
   }
