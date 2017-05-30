@@ -17,7 +17,7 @@ export class PropertyOption extends Component {
       connectDragSource(
         <li className="list-group-item">
           <button className="btn btn-default btn-sm">
-            <i className="fa fa-chevron-left"></i>
+            <i className="fa fa-plus"></i>
           </button>
           <span><i className={iconClass}></i>{label}</span>
         </li>
