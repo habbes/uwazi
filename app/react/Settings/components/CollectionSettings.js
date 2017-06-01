@@ -122,6 +122,70 @@ export class CollectionSettings extends Component {
               <p>Always use URLs relative to your site, starting with / and skipping the https://yoursite.com/.</p>
             </div>
             <div className="form-group">
+              <label className="form-group-label">{t('System', 'Date format')}</label>
+              <h6>Order</h6>
+              <div className="radio">
+                <label>
+                  <input
+                      onChange={this.changeLandingPage.bind(this)}
+                      name="dateFormatOrder"
+                      type="radio"
+                      value="YMD"
+                      checked
+                    />
+                  <span>Year, Month, Day <code>2017/06/30</code></span>
+                </label>
+              </div>
+              <div className="radio">
+                <label>
+                  <input
+                      onChange={this.changeLandingPage.bind(this)}
+                      name="dateFormatOrder"
+                      type="radio"
+                      value="DMY"
+                    />
+                  <span>Day, Month, Year <code>30/06/2017</code></span>
+                </label>
+              </div>
+              <div className="radio">
+                <label>
+                  <input
+                      onChange={this.changeLandingPage.bind(this)}
+                      name="dateFormatOrder"
+                      type="radio"
+                      value="MDY"
+                    />
+                  <span>Month, Day, Year <code>06/30/2017</code></span>
+                </label>
+              </div>
+              <h6>Separator</h6>
+              <div className="radio">
+                <label>
+                  <input
+                      onChange={this.changeLandingPage.bind(this)}
+                      name="dateFormatSeparator"
+                      type="radio"
+                      value="slash"
+                      checked
+                    />
+                  <span>Slash <code>/</code></span>
+                </label>
+              </div>
+              <div className="radio">
+                <label>
+                  <input
+                      onChange={this.changeLandingPage.bind(this)}
+                      name="dateFormatSeparator"
+                      type="radio"
+                      value="dash"
+                    />
+                  <span>Dash <code>-</code></span>
+                </label>
+              </div>
+            </div>
+            <hr />
+            <h5>Advanced configuration</h5>
+            <div className="form-group">
               <label className="form-group-label" htmlFor="collectionMailerConfig">{t('System', 'Mailer configuration')}</label>
               <textarea name="collectionMailerConfig"
                         onChange={this.changeMailerConfig.bind(this)}
