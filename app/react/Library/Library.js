@@ -18,6 +18,8 @@ import {wrapDispatch} from 'app/Multireducer';
 
 import prioritySortingCriteria from 'app/utils/prioritySortingCriteria';
 
+import ChartExample from 'app/Charts/index';
+
 export default class Library extends RouteHandler {
 
   static renderTools() {
@@ -68,6 +70,7 @@ export default class Library extends RouteHandler {
       <div className="row panels-layout">
         <Helmet title={t('System', 'Library')} />
         <main className="document-viewer with-panel">
+          <div><ChartExample /></div>
           <DocumentsList storeKey="library"/>
         </main>
         <LibraryFilters storeKey="library"/>

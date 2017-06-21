@@ -80,6 +80,7 @@
     "react-dom": "15.5.0",
     "react-dropzone": "^3.4.0",
     "react-flags": "0.1.12",
+    "react-google-charts": "^1.5.5",
     "react-helmet": "^2.1.1",
     "react-modal": "^1.2.0",
     "react-redux": "^4.0.0",
