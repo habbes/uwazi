@@ -1,10 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {RadialChart, Hint} from 'react-vis';
 
 export default class RadialChartExample extends React.Component {
   componentWillMount() {
     this.setState({value: false});
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.state.value.color !== nextState.value.color;
   }
 
   render() {
@@ -15,6 +18,7 @@ export default class RadialChartExample extends React.Component {
         radius={140}
         showLabels={false}
         animation={true}
+        className="donut-chart-example"
         data={[
           {angle: 2},
           {angle: 6, label: 'Un label', subLabel: 'With annotation'},
@@ -22,22 +26,17 @@ export default class RadialChartExample extends React.Component {
           {angle: 3},
           {angle: 1}
         ]}
-        onValueMouseOver={v => {
-          console.log(v);
-          this.setState({value: v});
-        }}
+        onValueMouseOver={v => this.setState({value: v})}
         onMouseLeave={() => this.setState({value: false})}
         width={300}
         height={300}
       >
-        {value && <Hint value={value}>
+        {value && value.label && <Hint value={value}>
           <div className="rv-hint__content">
-            <h5>{value.label}</h5><br />{value.subLabel}
+            {value.label}<br /><span style={{color: '#999'}}>{value.subLabel}</span>
           </div>
         </Hint>}
       </RadialChart>
     );
   }
 }
-
-ReactDOM.render(<RadialChartExample />, document.querySelector('#chart'));

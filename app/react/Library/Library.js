@@ -16,7 +16,7 @@ import {actions as formActions} from 'react-redux-form';
 import {t} from 'app/I18N';
 import {wrapDispatch} from 'app/Multireducer';
 
-import 'app/Charts/index';
+import RadialChartExample from 'app/Charts/index';
 
 import prioritySortingCriteria from 'app/utils/prioritySortingCriteria';
 
@@ -70,7 +70,9 @@ export default class Library extends RouteHandler {
       <div className="row panels-layout">
         <Helmet title={t('System', 'Library')} />
         <main className="document-viewer with-panel">
-          <div id="chart"></div>
+          <div id="chart">
+            <RadialChartExample />
+          </div>
           <DocumentsList storeKey="library"/>
         </main>
         <LibraryFilters storeKey="library"/>

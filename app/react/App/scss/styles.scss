@@ -46,6 +46,14 @@
 
 @import "vendor/react-datepicker";
 
-@import '../../../../node_modules/react-vis/dist/main.scss';
+/*@import '../../../../node_modules/react-vis/dist/main';*/
+@import '../../../../node_modules/react-vis/dist/styles/examples';
+.donut-chart-example {
+  .rv-radial-chart__series--pie__slice:hover {
+    stroke: #000 !important;
+    stroke-width: 6px !important;
+    stroke-opacity: 0.3 !important;
+  }
+}
 
 
