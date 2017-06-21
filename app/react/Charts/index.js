@@ -1,5 +1,5 @@
 import React from 'react';
-import {ResponsiveContainer, PieChart, Pie, Cell, Sector} from 'recharts';
+import {ResponsiveContainer, PieChart, Pie, Legend, Cell, Sector} from 'recharts';
 
 export default class ChartExample extends React.Component {
   componentWillMount() {
@@ -50,7 +50,7 @@ export default class ChartExample extends React.Component {
     );
   }
 
-  onPieEnter(data, index) {
+  onIndexEnter(data, index) {
     this.setState({
       activeIndex: index
     });
@@ -72,7 +72,7 @@ export default class ChartExample extends React.Component {
     const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#D24040'];
 
     return (
-      <ResponsiveContainer height={280}>
+      <ResponsiveContainer height={300}>
         <PieChart>
           <Pie
               data={data}
@@ -83,11 +83,13 @@ export default class ChartExample extends React.Component {
               outerRadius={80}
               activeIndex={this.state.activeIndex}
               activeShape={this.renderActiveShape}
-              onMouseMove={this.onPieEnter.bind(this)}
-              fill="#8884d8"
-          >
-            {data.map((entry, index) => <Cell key={index} fill={colors[index % colors.length]}/>)}
+              onMouseMove={this.onIndexEnter.bind(this)}
+              fill="#8884d8">
+            {data.map((entry, index) =>
+              <Cell key={index} fill={colors[index % colors.length]} opacity={0.8} />
+            )}
           </Pie>
+          <Legend layout="vertical" align="right" verticalAlign="middle" onMouseEnter={this.onIndexEnter.bind(this)}/>
         </PieChart>
       </ResponsiveContainer>
     );
