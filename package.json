@@ -100,6 +100,7 @@
     "superagent": "1.6.1",
     "tiny-cookie": "^0.5.5",
     "validate.js": "^0.9.0",
+    "victory": "^0.21.0",
     "world-countries": "^1.8.0",
     "wrap-range-text": "^1.0.1"
   },

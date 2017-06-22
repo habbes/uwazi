@@ -1,61 +1,7 @@
 import React from 'react';
-import {ResponsiveContainer, PieChart, Pie, Legend, Cell, Sector} from 'recharts';
+import {VictoryContainer, VictoryPie, VictoryLegend, VictoryLabel} from 'victory';
 
 export default class ChartExample extends React.Component {
-  componentWillMount() {
-    this.setState({activeIndex: 0});
-  }
-
-  renderActiveShape(props) {
-    const RADIAN = Math.PI / 180;
-    const {cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value} = props;
-    const sin = Math.sin(-RADIAN * midAngle);
-    const cos = Math.cos(-RADIAN * midAngle);
-    const sx = cx + (outerRadius + 10) * cos;
-    const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 30) * sin;
-    const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-    const ey = my;
-    const textAnchor = cos >= 0 ? 'start' : 'end';
-
-    return (
-      <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>{payload.name}</text>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-        />
-        <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={outerRadius + 6}
-          outerRadius={outerRadius + 10}
-          fill={fill}
-        />
-        <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
-        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.name}: ${value}`}</text>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
-          {`(Proporción: ${(percent * 100).toFixed(2)}%)`}
-        </text>
-      </g>
-    );
-  }
-
-  onIndexEnter(data, index) {
-    this.setState({
-      activeIndex: index
-    });
-  }
-
   render() {
     const data = [
       {name: 'Colombia', value: 21},
@@ -72,52 +18,64 @@ export default class ChartExample extends React.Component {
     const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#D24040'];
 
     return (
-      <ResponsiveContainer height={300}>
-        <PieChart>
-          <Pie
-              data={data}
-              dataKey="value"
-              cx="50%"
-              cy="50%"
-              innerRadius={50}
-              outerRadius={80}
-              activeIndex={this.state.activeIndex}
-              activeShape={this.renderActiveShape}
-              onMouseMove={this.onIndexEnter.bind(this)}
-              fill="#8884d8">
-            {data.map((entry, index) =>
-              <Cell key={index} fill={colors[index % colors.length]} opacity={0.8} />
-            )}
-          </Pie>
-          <Legend layout="vertical" align="right" verticalAlign="middle" onMouseEnter={this.onIndexEnter.bind(this)}/>
-        </PieChart>
-      </ResponsiveContainer>
+      <VictoryContainer width={1200} height={350} responsive={true}>
+        <VictoryPie
+          data={data}
+          x="name"
+          y="value"
+          width={720}
+          height={270}
+          style={{
+            labels: {fontSize: 12},
+            parent: {border: '1px solid #f00'},
+            data: {opacity: 0.75}
+          }}
+          colorScale={colors}
+          padding={{left: 100, top: 50, bottom: 50}}
+
+          labelComponent={<VictoryLabel text=""/>}
+
+          events={[
+            {
+              target: 'data',
+              eventHandlers: {
+                onMouseOver: () => {
+                  return [{
+                    mutation: (props) => {
+                      return {
+                        style: Object.assign({}, props.style, {opacity: 1})
+                      };
+                    }
+                  }, {
+                    target: 'labels',
+                    mutation: (props) => {
+                      return {
+                        text: `${props.data[props.index].name}\nItems: ${props.data[props.index].value}`,
+                        style: [{fontWeight: 'bold'}, {fill: '#999'}]
+                      };
+                    }
+                  }];
+                },
+                onMouseOut: () => {
+                  return [{
+                    mutation: (props) => {
+                      return {
+                        style: Object.assign({}, props.style, {opacity: 0.75})
+                      };
+                    }
+                  }, {
+                    target: 'labels',
+                    mutation: () => {
+                      return {text: ''};
+                    }
+                  }];
+                }
+              }
+            }
+          ]}
+        />
+        <VictoryLegend data={data} colorScale={colors}/>
+      </VictoryContainer>
     );
   }
 }
-
-// import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip} from 'recharts';
-
-// export default class ChartExample extends React.Component {
-//   render() {
-//     const data = [
-//       {name: 'Page A', uv: 4000, pv: 2400, amt: 2400},
-//       {name: 'Page B', uv: 3000, pv: 1398, amt: 2210},
-//       {name: 'Page C', uv: 2000, pv: 9800, amt: 2290},
-//       {name: 'Page D', uv: 2780, pv: 3908, amt: 2000},
-//       {name: 'Page E', uv: 1890, pv: 4800, amt: 2181},
-//       {name: 'Page F', uv: 2390, pv: 3800, amt: 2500},
-//       {name: 'Page G', uv: 3490, pv: 4300, amt: 2100}
-//     ];
-
-//     return (
-//       <LineChart width={600} height={300} data={data} margin={{top: 5, right: 20, bottom: 5, left: 0}}>
-//         <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-//         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-//         <XAxis dataKey="name" />
-//         <YAxis />
-//         <Tooltip />
-//       </LineChart>
-//     );
-//   }
-// }
