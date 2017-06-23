@@ -1,5 +1,11 @@
 import React from 'react';
-import {VictoryContainer, VictoryPie, VictoryLegend, VictoryLabel} from 'victory';
+import {VictorySharedEvents, VictoryPie, VictoryLegend, VictoryLabel} from 'victory';
+
+class LegendVictoryLabel extends React.Component {
+  render() {
+    return <VictoryLabel {...this.props} />;
+  }
+}
 
 export default class ChartExample extends React.Component {
   render() {
@@ -18,64 +24,84 @@ export default class ChartExample extends React.Component {
     const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#D24040'];
 
     return (
-      <VictoryContainer width={1200} height={350} responsive={true}>
-        <VictoryPie
-          data={data}
-          x="name"
-          y="value"
-          width={720}
-          height={270}
-          style={{
-            labels: {fontSize: 12},
-            parent: {border: '1px solid #f00'},
-            data: {opacity: 0.75}
-          }}
-          colorScale={colors}
-          padding={{left: 100, top: 50, bottom: 50}}
-
-          labelComponent={<VictoryLabel text=""/>}
-
-          events={[
-            {
-              target: 'data',
-              eventHandlers: {
-                onMouseOver: () => {
-                  return [{
-                    mutation: (props) => {
-                      return {
-                        style: Object.assign({}, props.style, {opacity: 1})
-                      };
-                    }
-                  }, {
-                    target: 'labels',
-                    mutation: (props) => {
-                      return {
-                        text: `${props.data[props.index].name}\nItems: ${props.data[props.index].value}`,
-                        style: [{fontWeight: 'bold'}, {fill: '#999'}]
-                      };
-                    }
-                  }];
-                },
-                onMouseOut: () => {
-                  return [{
-                    mutation: (props) => {
-                      return {
-                        style: Object.assign({}, props.style, {opacity: 0.75})
-                      };
-                    }
-                  }, {
-                    target: 'labels',
-                    mutation: () => {
-                      return {text: ''};
-                    }
-                  }];
-                }
+      <svg viewBox="0 0 900 350">
+        <VictorySharedEvents
+          events={[{
+            childName: ['innerRing', 'outerRing', 'legend'],
+            target: 'data',
+            eventHandlers: {
+              onMouseOver: () => {
+                return [{
+                  childName: ['innerRing', 'outerRing'],
+                  mutation: (props) => {
+                    return {
+                      style: Object.assign({}, props.style, {opacity: 1})
+                    };
+                  }
+                }, {
+                  childName: ['innerRing'],
+                  target: 'labels',
+                  mutation: (props) => {
+                    return {
+                      text: `${props.data[props.index].name}\nItems: ${props.data[props.index].value}`,
+                      style: [{fontSize: '12px', fontWeight: 'bold'}, {fontSize: '10px', fill: '#999'}]
+                    };
+                  }
+                }];
+              },
+              onMouseOut: () => {
+                return [{
+                  childName: ['innerRing', 'outerRing'],
+                  mutation: () => {
+                    return null;
+                  }
+                }, {
+                  childName: ['innerRing'],
+                  target: 'labels',
+                  mutation: () => {
+                    return {text: ''};
+                  }
+                }];
               }
             }
-          ]}
-        />
-        <VictoryLegend data={data} colorScale={colors}/>
-      </VictoryContainer>
+          }]}>
+          <g transform={"translate(290, -40)"}>
+            <VictoryPie name="outerRing"
+              width={350}
+              standalone={false}
+              data={data}
+              x="name"
+              y="value"
+              style={{
+                labels: {fontSize: 6},
+                parent: {border: '1px solid #f00'},
+                data: {opacity: 0}
+              }}
+              labelComponent={<VictoryLabel text=""/>}
+              colorScale={colors}
+              innerRadius={120}
+            />
+          </g>
+          <g transform={"translate(300, -40)"}>
+            <VictoryPie name="innerRing"
+              width={330}
+              standalone={false}
+              data={data}
+              x="name"
+              y="value"
+              style={{data: {opacity: 0.75}}}
+              labelComponent={<VictoryLabel text=""/>}
+              colorScale={colors}
+            />
+          </g>
+          <g transform={"translate(0,0)"}>
+            <VictoryLegend name="legend"
+                           data={data}
+                           colorScale={colors}
+                           labelComponent={<LegendVictoryLabel />}/>
+          </g>
+        </VictorySharedEvents>
+      </svg>
     );
   }
 }
