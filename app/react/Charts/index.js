@@ -1,123 +1,189 @@
 import React from 'react';
-import {ResponsiveContainer, PieChart, Pie, Legend, Cell, Sector} from 'recharts';
+import C3Chart from 'react-c3js';
 
-export default class ChartExample extends React.Component {
-  componentWillMount() {
-    this.setState({activeIndex: 0});
-  }
-
-  renderActiveShape(props) {
-    const RADIAN = Math.PI / 180;
-    const {cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value} = props;
-    const sin = Math.sin(-RADIAN * midAngle);
-    const cos = Math.cos(-RADIAN * midAngle);
-    const sx = cx + (outerRadius + 10) * cos;
-    const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 30) * sin;
-    const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-    const ey = my;
-    const textAnchor = cos >= 0 ? 'start' : 'end';
-
-    return (
-      <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>{payload.name}</text>
-        <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
-        />
-        <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={outerRadius + 6}
-          outerRadius={outerRadius + 10}
-          fill={fill}
-        />
-        <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none"/>
-        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none"/>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.name}: ${value}`}</text>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
-          {`(Proporción: ${(percent * 100).toFixed(2)}%)`}
-        </text>
-      </g>
-    );
-  }
-
-  onIndexEnter(data, index) {
-    this.setState({
-      activeIndex: index
-    });
-  }
-
+export class ChartPie extends React.Component {
   render() {
-    const data = [
-      {name: 'Colombia', value: 21},
-      {name: 'El Salvador', value: 7},
-      {name: 'Peru', value: 6},
-      {name: 'Mexico', value: 5},
-      {name: 'Ecuador', value: 5},
-      {name: 'Venezuela', value: 2},
-      {name: 'Haiti', value: 2},
-      {name: 'Chile', value: 1},
-      {name: 'Costa Rica', value: 1}
-    ];
-
-    const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#D24040'];
+    const chartData = {
+      data: {
+        columns: [
+          ['Colombia', 21],
+          ['El Salvador', 7],
+          ['Peru', 6],
+          ['Mexico', 5],
+          ['Ecuador', 5],
+          ['Venezuela', 2],
+          ['Haiti', 2],
+          ['Chile', 1],
+          ['Costa Rica', 1]
+        ],
+        type: 'pie',
+        title: 'Pais'
+      },
+      legend: {
+        position: 'inset',
+        inset: {
+          anchor: 'top-right',
+          x: 20,
+          y: 0,
+          step: null
+        }
+      },
+      pie: {
+        expand: false
+      }
+    };
 
     return (
-      <ResponsiveContainer height={300}>
-        <PieChart>
-          <Pie
-              data={data}
-              dataKey="value"
-              cx="50%"
-              cy="50%"
-              innerRadius={50}
-              outerRadius={80}
-              activeIndex={this.state.activeIndex}
-              activeShape={this.renderActiveShape}
-              onMouseMove={this.onIndexEnter.bind(this)}
-              fill="#8884d8">
-            {data.map((entry, index) =>
-              <Cell key={index} fill={colors[index % colors.length]} opacity={0.8} />
-            )}
-          </Pie>
-          <Legend layout="vertical" align="right" verticalAlign="middle" onMouseEnter={this.onIndexEnter.bind(this)}/>
-        </PieChart>
-      </ResponsiveContainer>
+      <C3Chart {...chartData} />
     );
   }
 }
 
-// import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip} from 'recharts';
+export class ChartBar extends React.Component {
+  render() {
+    // ['Medidas Provisionales', 34],
+    // ['Supervisión de cumplimiento de Sentencia', 16],
+    // ['En casos', 2],
+    // ['De asunto', 2],
+    // ['Otros', 1]
+    const chartData = {
+      data: {
+        columns: [
+          ['Manuel E. Ventura Robles', 37],
+          ['Diego García-Sayán', 28],
+          ['Eduardo Vio Grossi', 24],
+          ['Leonardo A. Franco', 23],
+          ['Rhadys Abreu Blondet', 23],
+          ['Margarette May Macaulay', 22],
+          ['Alberto Pérez Pérez', 21],
+          ['Sergio García Ramírez', 20],
+          ['Cecilia Medina Quiroga', 14],
+          ['Roberto de Figueiredo Caldas', 13],
+          ['Antonio A. Cançado Trindade', 12],
+          ['Alirio Abreu Burelli', 12],
+          ['Eduardo Ferrer Mac-Gregor Poisot', 12],
+          ['Oliver Jackman', 10],
+          ['Humberto Antonio Sierra Porto', 9],
+          ['Hernán Salgado Pesantes', 8],
+          ['Máximo Pacheco Gómez', 7],
+          ['Carlos Vicente de Roux-Rengifo', 6],
+          ['Héctor Fix Zamudio', 2],
+          ['Eugenio Raúl Zaffaroni', 1],
+          ['Leoncio Patricio Pazmiño Freire', 1],
+          ['Elizabeth Odio Benito', 1]
+        ],
+        type: 'bar'
+      },
+      axis: {
+        x: {
+          type: 'category',
+          categories: [
+            'Firmantes'
+          ]
+        }
+      },
+      legend: {
+        // position: 'inset',
+        // inset: {
+        //   anchor: 'top-right',
+        //   x: 20,
+        //   y: 0,
+        //   step: null
+        // }
+      },
+      tooltip: {
+        grouped: false
+      }
+    };
 
-// export default class ChartExample extends React.Component {
-//   render() {
-//     const data = [
-//       {name: 'Page A', uv: 4000, pv: 2400, amt: 2400},
-//       {name: 'Page B', uv: 3000, pv: 1398, amt: 2210},
-//       {name: 'Page C', uv: 2000, pv: 9800, amt: 2290},
-//       {name: 'Page D', uv: 2780, pv: 3908, amt: 2000},
-//       {name: 'Page E', uv: 1890, pv: 4800, amt: 2181},
-//       {name: 'Page F', uv: 2390, pv: 3800, amt: 2500},
-//       {name: 'Page G', uv: 3490, pv: 4300, amt: 2100}
-//     ];
+    return (
+      <C3Chart {...chartData} />
+    );
+  }
+}
 
-//     return (
-//       <LineChart width={600} height={300} data={data} margin={{top: 5, right: 20, bottom: 5, left: 0}}>
-//         <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-//         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-//         <XAxis dataKey="name" />
-//         <YAxis />
-//         <Tooltip />
-//       </LineChart>
-//     );
-//   }
-// }
+export class ChartBarAlt extends React.Component {
+  render() {
+    // ['Medidas Provisionales', 34],
+    // ['Supervisión de cumplimiento de Sentencia', 16],
+    // ['En casos', 2],
+    // ['De asunto', 2],
+    // ['Otros', 1]
+
+    const titles = [
+      'Manuel E. Ventura Robles',
+      'Diego García-Sayán',
+      'Eduardo Vio Grossi',
+      'Leonardo A. Franco',
+      'Rhadys Abreu Blondet',
+      'Margarette May Macaulay',
+      'Alberto Pérez Pérez',
+      'Sergio García Ramírez',
+      'Cecilia Medina Quiroga',
+      'Roberto de Figueiredo Caldas',
+      'Antonio A. Cançado Trindade',
+      'Alirio Abreu Burelli',
+      'Eduardo Ferrer Mac-Gregor Poisot',
+      'Oliver Jackman',
+      'Humberto Antonio Sierra Porto',
+      'Hernán Salgado Pesantes',
+      'Máximo Pacheco Gómez',
+      'Carlos Vicente de Roux-Rengifo',
+      'Héctor Fix Zamudio',
+      'Eugenio Raúl Zaffaroni',
+      'Leoncio Patricio Pazmiño Freire',
+      'Elizabeth Odio Benito'
+    ];
+
+    const values = [37, 28, 24, 23, 23, 22, 21, 20, 14, 13, 12, 12, 12, 10, 9, 8, 7, 6, 2, 1, 1, 1];
+
+    const chartData = {
+      data: {
+        columns: [
+          ['Firmantes', ...values]
+        ],
+        type: 'bar'
+      },
+      axis: {
+        x: {
+          type: 'category',
+          categories: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        }
+      },
+      legend: {
+        // position: 'inset',
+        // inset: {
+        //   anchor: 'top-right',
+        //   x: 20,
+        //   y: 0,
+        //   step: null
+        // }
+      },
+      tooltip: {
+        grouped: true,
+        format: {
+          title: () => 'Firmantes',
+          name: function (name, ratio, id, index) {
+            return titles[index];
+          }
+        }
+      }
+    };
+
+    return (
+      <C3Chart {...chartData} />
+    );
+  }
+}
+
+export default class ChartExample extends React.Component {
+  render() {
+    return (
+      <div>
+        <ChartPie />
+        <ChartBar />
+        <ChartBarAlt />
+      </div>
+    );
+  }
+}
