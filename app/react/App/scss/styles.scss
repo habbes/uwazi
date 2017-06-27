@@ -46,3 +46,7 @@
 
 @import "vendor/react-datepicker";
 
+.recharts-tooltip-cursor {
+  fill: #f80 !important;
+  opacity: 0.2 !important;
+}

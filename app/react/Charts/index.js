@@ -1,7 +1,9 @@
 import React from 'react';
-import {ResponsiveContainer, PieChart, Pie, Legend, Cell, Sector} from 'recharts';
+import PropTypes from 'prop-types';
+import {ResponsiveContainer, PieChart, Pie, Legend, Cell, Sector,
+        BarChart, XAxis, YAxis, CartesianGrid, Bar, Tooltip} from 'recharts';
 
-export default class ChartExample extends React.Component {
+export class PieExample extends React.Component {
   componentWillMount() {
     this.setState({activeIndex: 0});
   }
@@ -96,28 +98,79 @@ export default class ChartExample extends React.Component {
   }
 }
 
-// import {LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip} from 'recharts';
+class ExtendedTooltip extends React.Component {
+  render() {
+    // console.log('ExtendedTooltip: ', this.props);
+    if (this.props.active) {
+      return (
+        <div style={{backgroundColor: '#fff', border: '1px solid #ccc'}}>
+          <div style={{backgroundColor: '#eee', borderBottom: '1px dashed #ccc', padding: '5px'}}>
+            Firmantes
+          </div>
+          <div style={{padding: '5px'}}>
+            {this.props.payload[0].payload.name}:&nbsp;&nbsp;<b style={{color: '#600'}}>{this.props.payload[0].value}</b>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }
+}
 
-// export default class ChartExample extends React.Component {
-//   render() {
-//     const data = [
-//       {name: 'Page A', uv: 4000, pv: 2400, amt: 2400},
-//       {name: 'Page B', uv: 3000, pv: 1398, amt: 2210},
-//       {name: 'Page C', uv: 2000, pv: 9800, amt: 2290},
-//       {name: 'Page D', uv: 2780, pv: 3908, amt: 2000},
-//       {name: 'Page E', uv: 1890, pv: 4800, amt: 2181},
-//       {name: 'Page F', uv: 2390, pv: 3800, amt: 2500},
-//       {name: 'Page G', uv: 3490, pv: 4300, amt: 2100}
-//     ];
+ExtendedTooltip.propTypes = {
+  payload: PropTypes.array,
+  active: PropTypes.bool
+};
 
-//     return (
-//       <LineChart width={600} height={300} data={data} margin={{top: 5, right: 20, bottom: 5, left: 0}}>
-//         <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-//         <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-//         <XAxis dataKey="name" />
-//         <YAxis />
-//         <Tooltip />
-//       </LineChart>
-//     );
-//   }
-// }
+export class BarExample extends React.Component {
+  render() {
+    const data = [
+      {name: 'Manuel E. Ventura Robles', xAxisName: '', value: 37},
+      {name: 'Diego García-Sayán', xAxisName: '', value: 28},
+      {name: 'Eduardo Vio Grossi', xAxisName: '', value: 24},
+      {name: 'Leonardo A. Franco', xAxisName: '', value: 23},
+      {name: 'Rhadys Abreu Blondet', xAxisName: '', value: 23},
+      {name: 'Margarette May Macaulay', xAxisName: '', value: 22},
+      {name: 'Alberto Pérez Pérez', xAxisName: '', value: 21},
+      {name: 'Sergio García Ramírez', xAxisName: '', value: 20},
+      {name: 'Cecilia Medina Quiroga', xAxisName: '', value: 14},
+      {name: 'Roberto de Figueiredo Caldas', xAxisName: '', value: 13},
+      {name: 'Antonio A. Cançado Trindade', xAxisName: '', value: 12},
+      {name: 'Alirio Abreu Burelli', xAxisName: '', value: 12},
+      {name: 'Eduardo Ferrer Mac-Gregor Poisot', xAxisName: '', value: 12},
+      {name: 'Oliver Jackman', xAxisName: '', value: 10},
+      {name: 'Humberto Antonio Sierra Porto', xAxisName: '', value: 9},
+      {name: 'Hernán Salgado Pesantes', xAxisName: '', value: 8},
+      {name: 'Máximo Pacheco Gómez', xAxisName: '', value: 7},
+      {name: 'Carlos Vicente de Roux-Rengifo', xAxisName: '', value: 6},
+      {name: 'Héctor Fix Zamudio', xAxisName: '', value: 2},
+      {name: 'Eugenio Raúl Zaffaroni', xAxisName: '', value: 1},
+      {name: 'Leoncio Patricio Pazmiño Freire', xAxisName: '', value: 1},
+      {name: 'Elizabeth Odio Benito', xAxisName: '', value: 1}
+    ];
+
+    return (
+      <ResponsiveContainer height={300}>
+        <BarChart height={300} data={data}
+                  margin={{top: 5, right: 30, left: 20, bottom: 25}}>
+          <XAxis dataKey="xAxisName" label="Firmantes"/>
+          <YAxis/>
+          <CartesianGrid strokeDasharray="2 4"/>
+          <Tooltip content={<ExtendedTooltip parentData={data} />}/>
+          <Bar dataKey="value" fill="#D24040" />
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
+}
+
+export default class ChartExample extends React.Component {
+  render() {
+    return (
+      <div>
+        <PieExample />
+        <BarExample />
+      </div>
+    );
+  }
+}
