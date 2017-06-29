@@ -3,22 +3,9 @@ import PropTypes from 'prop-types';
 import {ResponsiveContainer, PieChart, Pie, Legend, Cell, Sector,
         BarChart, XAxis, YAxis, CartesianGrid, Bar, Tooltip} from 'recharts';
 
-import Immutable from 'immutable';
-
 export class PieExample extends React.Component {
   componentWillMount() {
-    const fullData = Immutable.fromJS([
-      {name: 'Colombia', value: 21, enabled: true},
-      {name: 'El Salvador', value: 7, enabled: true},
-      {name: 'Peru', value: 6, enabled: true},
-      {name: 'Mexico', value: 5, enabled: true},
-      {name: 'Ecuador', value: 5, enabled: true},
-      {name: 'Venezuela', value: 2, enabled: true},
-      {name: 'Haiti', value: 2, enabled: true},
-      {name: 'Chile', value: 1, enabled: true},
-      {name: 'Costa Rica', value: 1, enabled: true}
-    ]);
-    this.setState({activeIndex: 0, fullData});
+    this.setState({activeIndex: 0});
   }
 
   renderActiveShape(props) {
@@ -45,7 +32,6 @@ export class PieExample extends React.Component {
           startAngle={startAngle}
           endAngle={endAngle}
           fill={fill}
-          stroke="#fff"
         />
         <Sector
           cx={cx}
@@ -66,60 +52,32 @@ export class PieExample extends React.Component {
     );
   }
 
-  getFilteredIndex(data, index) {
-    let filteredIndexMap = {};
-    let enabledIndices = -1;
-    data.forEach((item, iterator) => {
-      if (item.get('enabled')) {
-        enabledIndices += 1;
-        filteredIndexMap[iterator] = enabledIndices;
-        return;
-      }
-      filteredIndexMap[iterator] = null;
-    });
-
-    return filteredIndexMap[index];
-  }
-
   onIndexEnter(data, index) {
-    this.setState({activeIndex: index});
-  }
-
-  onFullIndexEnter(data, index) {
-    this.onIndexEnter(null, this.getFilteredIndex(this.state.fullData, index));
-  }
-
-  onIndexClick(data, index) {
-    const oldData = this.state.fullData;
-    const enabled = !oldData.getIn([index, 'enabled']);
-    let activeIndex = null;
-    const fullData = oldData.setIn([index, 'enabled'], enabled);
-    if (enabled) {
-      activeIndex = this.getFilteredIndex(fullData, index);
-    }
-
-    this.setState({activeIndex, fullData});
+    this.setState({
+      activeIndex: index
+    });
   }
 
   render() {
-    const fullColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#D24040', '#A250B3'];
-    const filteredColors = [];
+    const data = [
+      {name: 'Colombia', value: 21},
+      {name: 'El Salvador', value: 7},
+      {name: 'Peru', value: 6},
+      {name: 'Mexico', value: 5},
+      {name: 'Ecuador', value: 5},
+      {name: 'Venezuela', value: 2},
+      {name: 'Haiti', value: 2},
+      {name: 'Chile', value: 1},
+      {name: 'Costa Rica', value: 1}
+    ];
 
-    const fullData = this.state.fullData.toJS();
-
-    const filteredData = fullData.reduce((results, item, index) => {
-      if (item.enabled) {
-        results.push(item);
-        filteredColors.push(fullColors[index % fullColors.length]);
-      }
-      return results;
-    }, []);
+    const colors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#D24040'];
 
     return (
       <ResponsiveContainer height={300}>
         <PieChart>
           <Pie
-              data={filteredData}
+              data={data}
               dataKey="value"
               cx="50%"
               cy="50%"
@@ -127,30 +85,13 @@ export class PieExample extends React.Component {
               outerRadius={80}
               activeIndex={this.state.activeIndex}
               activeShape={this.renderActiveShape}
-              animationBegin={200}
-              animationDuration={500}
               onMouseMove={this.onIndexEnter.bind(this)}
-              onClick={this.onIndexEnter.bind(this)}
               fill="#8884d8">
-            {filteredData.map((entry, index) =>
-              <Cell key={index} fill={filteredColors[index]} opacity={0.8} />
+            {data.map((entry, index) =>
+              <Cell key={index} fill={colors[index % colors.length]} opacity={0.8} />
             )}
           </Pie>
-          <Legend layout="vertical"
-                  align="right"
-                  verticalAlign="middle"
-                  onMouseEnter={this.onFullIndexEnter.bind(this)}
-                  onClick={this.onIndexClick.bind(this)}
-                  payload={fullData.map((item, index) => {
-                    return {
-                      value: item.name,
-                      type: 'rect',
-                      color: fullData[index].enabled ? fullColors[index % fullColors.length] : '#aaa',
-                      className: 'mierda',
-                      formatter: () => <span style={{color: fullData[index].enabled ? '#333' : '#999'}}>{item.name}</span>
-                    };
-                  })}
-          />
+          <Legend layout="vertical" align="right" verticalAlign="middle" onMouseEnter={this.onIndexEnter.bind(this)}/>
         </PieChart>
       </ResponsiveContainer>
     );
@@ -159,6 +100,7 @@ export class PieExample extends React.Component {
 
 class ExtendedTooltip extends React.Component {
   render() {
+    // console.log('ExtendedTooltip: ', this.props);
     if (this.props.active) {
       return (
         <div style={{backgroundColor: '#fff', border: '1px solid #ccc'}}>
