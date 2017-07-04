@@ -154,6 +154,17 @@ header {
       border-color: $c-white;
     }
   }
+  
+  svg {
+    height: 14px;
+    position: relative;
+    top: 2px;
+    @if $theme == light {
+      fill: $c-black;
+    } @else {
+      fill: $c-white;
+    }
+  }
 }
 
 .menuActions {
