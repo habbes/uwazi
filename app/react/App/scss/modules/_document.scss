@@ -213,4 +213,10 @@
     width: auto;
     max-width: 75px;
   }
+  .cs-loader-container{
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    overflow: hidden;
+  }
 }
