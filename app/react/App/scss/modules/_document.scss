@@ -122,7 +122,11 @@
       width: 16px;
       text-align: center;
       border-radius: 50%;
+      padding-left: 2px;
     }
+  }
+  button i {
+    padding-right: 4px;
   }
 }
 
