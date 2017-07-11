@@ -8,6 +8,7 @@ import {RowList} from 'app/Layout/Lists';
 import Loader from 'app/components/Elements/Loader';
 import Footer from 'app/App/Footer';
 import {NeedAuthorization} from 'app/Auth';
+import ShowIf from 'app/App/ShowIf';
 import {t} from 'app/I18N';
 
 const loadMoreAmmount = 30;
@@ -46,10 +47,12 @@ export default class DocumentsList extends Component {
     return (
       <div className="documents-list">
         <div className="main-wrapper">
-          <div className="sort-by">
-            <button className="btn btn-success">Library</button>
-            <button className="btn btn-default">Charts</button>
-          </div>
+          <ShowIf if={Boolean(this.props.storeKey)}>
+            <div className="sort-by">
+              <button className="btn btn-success"><i className="fa fa-th-large" /></button>
+              <button className="btn btn-default"><i className="fa fa-area-chart" /></button>
+            </div>
+          </ShowIf>
           <div className="sort-by">
               <div className="u-floatLeft documents-counter">{counter}</div>
               <SortButtons sortCallback={this.props.searchDocuments}
